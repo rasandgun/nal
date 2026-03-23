@@ -38,7 +38,7 @@ void printAST(ASTNode* node, int indent = 0) {
         printAST(f->body, indent + 1);
     } else if (VarDecl* v = dynamic_cast<VarDecl*>(node)) {
         std::cout << "Var " << v->name << ": ";
-        if (v->type.isArray) std::cout << "array[" << v->type.arraySize << "]";
+        if (v->type.isArray) std::cout << "array[" << "]";
         else if (v->type.base == TYPE_INT) std::cout << "int";
         else if (v->type.base == TYPE_CHAR) std::cout << "char";
         else if (v->type.base == TYPE_BOOL) std::cout << "bool";
@@ -126,14 +126,11 @@ void printAST(ASTNode* node, int indent = 0) {
 }
 
 int main(int argc, char* argv[]) {
-   /*if (argc != 2) {
+    if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <source file>\n";
         return 1;
-    }*/
-   std::cout << argv[0] << std::endl;
-    std::string path;
-    std::cin >> path;
-    std::ifstream file(path);
+    }
+    std::ifstream file(argv[1]);
     if (!file) {
         std::cerr << "Cannot open file: " << argv[1] << "\n";
         return 1;

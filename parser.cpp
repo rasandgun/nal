@@ -121,11 +121,9 @@ Type Parser::typeSpecifier() {
     if (check("[")) {
         advance(); // съедаем '['
         isArray = true;
-        Token sz = consumeInteger("Expected array size");
-        arraySize = std::stoi(sz.value);
         consume("]", "Expected ']'");
     }
-    return Type(bt, isArray, arraySize);
+    return Type(bt, isArray);
 }
 
 FunctionDecl* Parser::funDeclaration() {
@@ -269,9 +267,9 @@ ASTNode* Parser::expression() {
     if (match(",")) {
         std::vector<ASTNode*> exprs;
         exprs.push_back(left);
-        while (match(",")) {
+        do {
             exprs.push_back(assignment());
-        }
+        }while (match(","));
         return new CommaExpr(exprs, left->line, left->col);
     }
     return left;

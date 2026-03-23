@@ -206,62 +206,79 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
 
 Type SemanticAnalyzer::getExprType(ASTNode* node) {
     if (LiteralExpr* lit = dynamic_cast<LiteralExpr*>(node)) {
+        Type t;
         switch (lit->kind) {
-            case LiteralExpr::LIT_INT: return Type(TYPE_INT);
-            case LiteralExpr::LIT_FLOAT: return Type(TYPE_FLOAT);
-            case LiteralExpr::LIT_CHAR: return Type(TYPE_CHAR);
-            case LiteralExpr::LIT_STRING: return Type(TYPE_CHAR, true, 0);
-            case LiteralExpr::LIT_BOOL: return Type(TYPE_BOOL);
+            case LiteralExpr::LIT_INT:    t = Type(TYPE_INT); break;
+            case LiteralExpr::LIT_FLOAT:  t = Type(TYPE_FLOAT); break;
+            case LiteralExpr::LIT_CHAR:   t = Type(TYPE_CHAR); break;
+            case LiteralExpr::LIT_STRING: t = Type(TYPE_CHAR, true); break;
+            case LiteralExpr::LIT_BOOL:   t = Type(TYPE_BOOL); break;
         }
-    } else if (IdentifierExpr* id = dynamic_cast<IdentifierExpr*>(node)) {
+        node->type = t;          // сохраняем тип
+        return t;
+    } 
+    else if (IdentifierExpr* id = dynamic_cast<IdentifierExpr*>(node)) {
         Symbol* sym = current->lookup(id->name);
         if (!sym) throw std::runtime_error("Undeclared identifier: " + id->name);
         if (!sym->initialized && !sym->isFunction)
             throw std::runtime_error("Variable used before initialization: " + id->name);
+        node->type = sym->type;  // сохраняем тип
         return sym->type;
-    } else if (BinaryExpr* bin = dynamic_cast<BinaryExpr*>(node)) {
+    }
+    else if (BinaryExpr* bin = dynamic_cast<BinaryExpr*>(node)) {
         Type left = getExprType(bin->left);
         Type right = getExprType(bin->right);
         std::string op = bin->op;
+        Type result;
+
         if (op == "=" || op == "*=" || op == "/=" || op == "%=" || op == "+=" || op == "-=") {
-            // Проверка lvalue: левая часть должна быть идентификатором или элементом массива
             if (!dynamic_cast<IdentifierExpr*>(bin->left) && !dynamic_cast<ArrayAccessExpr*>(bin->left))
                 throw std::runtime_error("Left side of assignment must be lvalue");
             if (!typeCompatible(left, right))
                 throw std::runtime_error("Type mismatch in assignment");
-            return left;
-        } else if (op == "+" || op == "-" || op == "*" || op == "/" || op == "%") {
+            result = left;
+        }
+        else if (op == "+" || op == "-" || op == "*" || op == "/" || op == "%") {
             if (!isArithmetic(left) || !isArithmetic(right))
                 throw std::runtime_error("Arithmetic operation requires arithmetic types");
-            if (left.base == TYPE_FLOAT || right.base == TYPE_FLOAT)
-                return Type(TYPE_FLOAT);
-            else
-                return Type(TYPE_INT);
-        } else if (op == "==" || op == "!=" || op == "<" || op == ">" || op == "<=" || op == ">=") {
+            result = (left.base == TYPE_FLOAT || right.base == TYPE_FLOAT) ? Type(TYPE_FLOAT) : Type(TYPE_INT);
+        }
+        else if (op == "==" || op == "!=" || op == "<" || op == ">" || op == "<=" || op == ">=") {
             if (!typeCompatible(left, right))
                 throw std::runtime_error("Comparison of incompatible types");
-            return Type(TYPE_BOOL);
-        } else if (op == "&&" || op == "||") {
+            result = Type(TYPE_BOOL);
+        }
+        else if (op == "&&" || op == "||") {
             if (!isScalar(left) || !isScalar(right))
                 throw std::runtime_error("Logical operation requires scalar types");
-            return Type(TYPE_BOOL);
-        } else {
+            result = Type(TYPE_BOOL);
+        }
+        else {
             throw std::runtime_error("Unknown operator: " + op);
         }
-    } else if (UnaryExpr* un = dynamic_cast<UnaryExpr*>(node)) {
+        node->type = result;     // сохраняем тип
+        return result;
+    }
+    else if (UnaryExpr* un = dynamic_cast<UnaryExpr*>(node)) {
         Type opnd = getExprType(un->operand);
+        Type result;
         if (un->op == "+" || un->op == "-") {
             if (!isArithmetic(opnd))
                 throw std::runtime_error("Unary +/- requires arithmetic type");
-            return opnd;
-        } else if (un->op == "!") {
+            result = opnd;
+        }
+        else if (un->op == "!") {
             if (!isScalar(opnd))
                 throw std::runtime_error("Unary ! requires scalar type");
-            return Type(TYPE_BOOL);
-        } else {
+            result = Type(TYPE_BOOL);
+        }
+        else {
             throw std::runtime_error("Unknown unary operator");
         }
-    } else if (CallExpr* call = dynamic_cast<CallExpr*>(node)) {
+        node->type = result;     // сохраняем тип
+        return result;
+    }
+    else if (CallExpr* call = dynamic_cast<CallExpr*>(node)) {
         Symbol* sym = current->lookup(call->funcName);
         if (!sym || !sym->isFunction)
             throw std::runtime_error("Call to undeclared function: " + call->funcName);
@@ -272,9 +289,10 @@ Type SemanticAnalyzer::getExprType(ASTNode* node) {
             if (!typeCompatible(sym->params[i].type, argType))
                 throw std::runtime_error("Argument type mismatch in call to " + call->funcName);
         }
+        node->type = sym->type;  // сохраняем тип
         return sym->type;
-    } else if (ArrayAccessExpr* arr = dynamic_cast<ArrayAccessExpr*>(node)) {
-        // arr->array должен быть IdentifierExpr
+    }
+    else if (ArrayAccessExpr* arr = dynamic_cast<ArrayAccessExpr*>(node)) {
         IdentifierExpr* id = dynamic_cast<IdentifierExpr*>(arr->array);
         if (!id) throw std::runtime_error("Array access requires identifier");
         Symbol* sym = current->lookup(id->name);
@@ -284,13 +302,15 @@ Type SemanticAnalyzer::getExprType(ASTNode* node) {
         if (!isInteger(idxType)) throw std::runtime_error("Array index must be integer");
         Type elem = sym->type;
         elem.isArray = false;
-        elem.arraySize = 0;
+        node->type = elem;       // сохраняем тип
         return elem;
-    } else if (CommaExpr* comm = dynamic_cast<CommaExpr*>(node)) {
+    }
+    else if (CommaExpr* comm = dynamic_cast<CommaExpr*>(node)) {
         Type last;
         for (size_t i = 0; i < comm->exprs.size(); ++i) {
             last = getExprType(comm->exprs[i]);
         }
+        node->type = last;       // сохраняем тип
         return last;
     }
     throw std::runtime_error("Unknown expression type");
@@ -298,7 +318,6 @@ Type SemanticAnalyzer::getExprType(ASTNode* node) {
 
 bool SemanticAnalyzer::typeCompatible(const Type& left, const Type& right) {
     if (left.base == right.base && left.isArray == right.isArray) {
-        if (left.isArray && left.arraySize != right.arraySize) return false;
         return true;
     }
     // Неявные преобразования между скалярными
