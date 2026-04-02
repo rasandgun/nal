@@ -98,7 +98,7 @@ VarDecl* Parser::varDeclaration() {
     Token id = consumeIdentifier("Expected identifier");
     consume(":", "Expected ':'");
     Type type = typeSpecifier();
-    ASTNode* init = nullptr;
+    Expression* init = nullptr;
     if (match("=")) {
         init = expression();
     }
@@ -121,9 +121,19 @@ Type Parser::typeSpecifier() {
     if (check("[")) {
         advance(); // съедаем '['
         isArray = true;
+        // Парсим размер массива
+        if (checkType(TOK_INTEGER)) {
+            Token sizeToken = consumeType(TOK_INTEGER, "Expected array size");
+            arraySize = std::stoi(sizeToken.value);
+            if (arraySize <= 0) {
+                error(sizeToken, "Array size must be positive");
+            }
+        } else {
+            error(peek(), "Expected array size (integer)");
+        }
         consume("]", "Expected ']'");
     }
-    return Type(bt, isArray);
+    return Type(bt, isArray, arraySize);
 }
 
 FunctionDecl* Parser::funDeclaration() {
@@ -187,7 +197,7 @@ ASTNode* Parser::statement() {
         return new ContinueStmt(l, c);
     }
     // иначе это выражение-оператор
-    ASTNode* expr = expression();
+    Expression* expr = expression();
     consume(";", "Expected ';'");
     return new ExprStmt(expr, expr->line, expr->col);
 }
@@ -195,7 +205,7 @@ ASTNode* Parser::statement() {
 IfStmt* Parser::ifStatement() {
     int line = previous().line, col = previous().col;
     consume("(", "Expected '('");
-    ASTNode* cond = expression();
+    Expression* cond = expression();
     consume(")", "Expected ')'");
     ASTNode* thenBranch = block();
     ASTNode* elseBranch = nullptr;
@@ -209,9 +219,9 @@ ForStmt* Parser::forStatement() {
     int line = previous().line, col = previous().col;
     consume("(", "Expected '('");
     ASTNode* init = forInit();
-    ASTNode* cond = expression();
+    Expression* cond = expression();
     consume(";", "Expected ';'");
-    ASTNode* update = nullptr;
+    Expression* update = nullptr;
     if (!check(")")) {
         update = expression();
     }
@@ -225,7 +235,7 @@ ASTNode* Parser::forInit() {
         advance();
         return varDeclaration();
     } else {
-        ASTNode* expr = expression();
+        Expression* expr = expression();
         consume(";", "Expected ';'");
         return new ExprStmt(expr, expr->line, expr->col);
     }
@@ -234,7 +244,7 @@ ASTNode* Parser::forInit() {
 WhileStmt* Parser::whileStatement() {
     int line = previous().line, col = previous().col;
     consume("(", "Expected '('");
-    ASTNode* cond = expression();
+    Expression* cond = expression();
     consume(")", "Expected ')'");
     ASTNode* body = block();
     return new WhileStmt(cond, body, line, col);
@@ -245,7 +255,7 @@ DoWhileStmt* Parser::doWhileStatement() {
     ASTNode* body = block();
     consume("while", "Expected 'while'");
     consume("(", "Expected '('");
-    ASTNode* cond = expression();
+    Expression* cond = expression();
     consume(")", "Expected ')'");
     consume(";", "Expected ';'");
     return new DoWhileStmt(body, cond, line, col);
@@ -253,7 +263,7 @@ DoWhileStmt* Parser::doWhileStatement() {
 
 ReturnStmt* Parser::returnStatement() {
     int line = previous().line, col = previous().col;
-    ASTNode* expr = nullptr;
+    Expression* expr = nullptr;
     if (!check(";")) {
         expr = expression();
     }
@@ -262,10 +272,10 @@ ReturnStmt* Parser::returnStatement() {
 }
 
 // === Выражения ===
-ASTNode* Parser::expression() {
-    ASTNode* left = assignment();
+Expression* Parser::expression() {
+    Expression* left = assignment();
     if (match(",")) {
-        std::vector<ASTNode*> exprs;
+        std::vector<Expression*> exprs;
         exprs.push_back(left);
         do {
             exprs.push_back(assignment());
@@ -275,85 +285,85 @@ ASTNode* Parser::expression() {
     return left;
 }
 
-ASTNode* Parser::assignment() {
-    ASTNode* left = logicalOr();
+Expression* Parser::assignment() {
+    Expression* left = logicalOr();
     // операторы присваивания: =, *=, /=, %=, +=, -=
     if (match("=") || match("*=") || match("/=") || match("%=") || match("+=") || match("-=")) {
         std::string op = previous().value;
-        ASTNode* right = assignment();
+        Expression* right = assignment();
         return new BinaryExpr(op, left, right, left->line, left->col);
     }
     return left;
 }
 
-ASTNode* Parser::logicalOr() {
-    ASTNode* left = logicalAnd();
+Expression* Parser::logicalOr() {
+    Expression* left = logicalAnd();
     while (match("||")) {
-        ASTNode* right = logicalAnd();
+        Expression* right = logicalAnd();
         left = new BinaryExpr("||", left, right, left->line, left->col);
     }
     return left;
 }
 
-ASTNode* Parser::logicalAnd() {
-    ASTNode* left = equality();
+Expression* Parser::logicalAnd() {
+    Expression* left = equality();
     while (match("&&")) {
-        ASTNode* right = equality();
+        Expression* right = equality();
         left = new BinaryExpr("&&", left, right, left->line, left->col);
     }
     return left;
 }
 
-ASTNode* Parser::equality() {
-    ASTNode* left = relational();
+Expression* Parser::equality() {
+    Expression* left = relational();
     while (match("==") || match("!=")) {
         std::string op = previous().value;
-        ASTNode* right = relational();
+        Expression* right = relational();
         left = new BinaryExpr(op, left, right, left->line, left->col);
     }
     return left;
 }
 
-ASTNode* Parser::relational() {
-    ASTNode* left = additive();
+Expression* Parser::relational() {
+    Expression* left = additive();
     while (match("<") || match(">") || match("<=") || match(">=")) {
         std::string op = previous().value;
-        ASTNode* right = additive();
+        Expression* right = additive();
         left = new BinaryExpr(op, left, right, left->line, left->col);
     }
     return left;
 }
 
-ASTNode* Parser::additive() {
-    ASTNode* left = multiplicative();
+Expression* Parser::additive() {
+    Expression* left = multiplicative();
     while (match("+") || match("-")) {
         std::string op = previous().value;
-        ASTNode* right = multiplicative();
+        Expression* right = multiplicative();
         left = new BinaryExpr(op, left, right, left->line, left->col);
     }
     return left;
 }
 
-ASTNode* Parser::multiplicative() {
-    ASTNode* left = unary();
+Expression* Parser::multiplicative() {
+    Expression* left = unary();
     while (match("*") || match("/") || match("%")) {
         std::string op = previous().value;
-        ASTNode* right = unary();
+        Expression* right = unary();
         left = new BinaryExpr(op, left, right, left->line, left->col);
     }
     return left;
 }
 
-ASTNode* Parser::unary() {
+Expression* Parser::unary() {
     if (match("+") || match("-") || match("!")) {
         std::string op = previous().value;
-        ASTNode* operand = unary();
+        Expression* operand = unary();
         return new UnaryExpr(op, operand, previous().line, previous().col);
     }
     return primary();
 }
 
-ASTNode* Parser::primary() {
+Expression* Parser::primary() {
     if (matchType(TOK_INTEGER)) {
         return new LiteralExpr(LiteralExpr::LIT_INT, previous().value, previous().line, previous().col);
     } else if (matchType(TOK_FLOAT)) {
@@ -368,19 +378,19 @@ ASTNode* Parser::primary() {
         std::string name = previous().value;
         int l = previous().line, c = previous().col;
         if (match("(")) {
-            std::vector<ASTNode*> args = arguments();
+            std::vector<Expression*> args = arguments();
             consume(")", "Expected ')'");
             return new CallExpr(name, args, l, c);
         } else if (check("[")) {
             advance(); // '['
-            ASTNode* idx = expression();
+            Expression* idx = expression();
             consume("]", "Expected ']'");
             return new ArrayAccessExpr(new IdentifierExpr(name, l, c), idx, l, c);
         } else {
             return new IdentifierExpr(name, l, c);
         }
     } else if (match("(")) {
-        ASTNode* expr = expression();
+        Expression* expr = expression();
         consume(")", "Expected ')'");
         return expr;
     }
@@ -388,8 +398,8 @@ ASTNode* Parser::primary() {
     return nullptr;
 }
 
-std::vector<ASTNode*> Parser::arguments() {
-    std::vector<ASTNode*> args;
+std::vector<Expression*> Parser::arguments() {
+    std::vector<Expression*> args;
     if (check(")")) return args;
     do {
         args.push_back(assignment());

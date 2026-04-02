@@ -14,7 +14,6 @@ void SemanticAnalyzer::Scope::declare(const std::string& name, const Type& type,
         throw std::runtime_error("Symbol already declared in this scope: " + name);
     Symbol sym;
     sym.type = type;
-    sym.initialized = false;
     sym.isFunction = isFunc;
     sym.params = params;
     symbols[name] = sym;
@@ -22,26 +21,21 @@ void SemanticAnalyzer::Scope::declare(const std::string& name, const Type& type,
 
 void SemanticAnalyzer::Scope::define(const std::string& name) {
     Symbol* s = lookup(name);
-    if (s) s->initialized = true;
-    else throw std::runtime_error("Symbol not found: " + name);
+    if (!s) throw std::runtime_error("Symbol not found: " + name);
 }
 
 SemanticAnalyzer::Symbol* SemanticAnalyzer::Scope::lookup(const std::string& name) {
-    std::map<std::string, Symbol>::iterator it = symbols.find(name);
+    auto it = symbols.find(name);
     if (it != symbols.end()) return &it->second;
     if (parent) return parent->lookup(name);
-    return NULL;
+    return nullptr;
 }
 
-bool SemanticAnalyzer::Scope::isInitialized(const std::string& name) {
-    Symbol* s = lookup(name);
-    return s && s->initialized;
-}
 
 Type* SemanticAnalyzer::Scope::getType(const std::string& name) {
     Symbol* s = lookup(name);
     if (s) return &s->type;
-    return NULL;
+    return nullptr;
 }
 
 bool SemanticAnalyzer::Scope::isFunction(const std::string& name) {
@@ -52,7 +46,7 @@ bool SemanticAnalyzer::Scope::isFunction(const std::string& name) {
 std::vector<Parameter>* SemanticAnalyzer::Scope::getParams(const std::string& name) {
     Symbol* s = lookup(name);
     if (s && s->isFunction) return &s->params;
-    return NULL;
+    return nullptr;
 }
 
 SemanticAnalyzer::Scope* SemanticAnalyzer::Scope::pushScope() {
@@ -118,7 +112,7 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
         inLoop = prevLoop;
         current = current->popScope();
     } else if (VarDecl* var = dynamic_cast<VarDecl*>(node)) {
-        if (current->lookup(var->name) != NULL) {
+        if (current->lookup(var->name) != nullptr) {
             throw std::runtime_error("Variable already declared: " + var->name);
         }
         current->declare(var->name, var->type);
@@ -204,25 +198,35 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
     }
 }
 
-Type SemanticAnalyzer::getExprType(ASTNode* node) {
+// Вспомогательная функция: получить имя базовой переменной для lvalue
+static std::string getLValueName(Expression* expr) {
+    if (IdentifierExpr* id = dynamic_cast<IdentifierExpr*>(expr)) {
+        return id->name;
+    } else if (ArrayAccessExpr* arr = dynamic_cast<ArrayAccessExpr*>(expr)) {
+        // arr->array — это IdentifierExpr
+        return arr->array->name;
+    } else {
+        throw std::runtime_error("Expression is not a valid lvalue");
+    }
+}
+
+Type SemanticAnalyzer::getExprType(Expression* node) {
     if (LiteralExpr* lit = dynamic_cast<LiteralExpr*>(node)) {
         Type t;
         switch (lit->kind) {
             case LiteralExpr::LIT_INT:    t = Type(TYPE_INT); break;
             case LiteralExpr::LIT_FLOAT:  t = Type(TYPE_FLOAT); break;
             case LiteralExpr::LIT_CHAR:   t = Type(TYPE_CHAR); break;
-            case LiteralExpr::LIT_STRING: t = Type(TYPE_CHAR, true); break;
+            case LiteralExpr::LIT_STRING: t = Type(TYPE_CHAR, true, 0); break;
             case LiteralExpr::LIT_BOOL:   t = Type(TYPE_BOOL); break;
         }
-        node->type = t;          // сохраняем тип
+        node->type = t;
         return t;
     } 
     else if (IdentifierExpr* id = dynamic_cast<IdentifierExpr*>(node)) {
         Symbol* sym = current->lookup(id->name);
         if (!sym) throw std::runtime_error("Undeclared identifier: " + id->name);
-        if (!sym->initialized && !sym->isFunction)
-            throw std::runtime_error("Variable used before initialization: " + id->name);
-        node->type = sym->type;  // сохраняем тип
+        node->type = sym->type;
         return sym->type;
     }
     else if (BinaryExpr* bin = dynamic_cast<BinaryExpr*>(node)) {
@@ -237,6 +241,9 @@ Type SemanticAnalyzer::getExprType(ASTNode* node) {
             if (!typeCompatible(left, right))
                 throw std::runtime_error("Type mismatch in assignment");
             result = left;
+            std::string varName = getLValueName(bin->left);
+            Symbol* sym = current->lookup(varName);
+            if (!sym) throw std::runtime_error("Symbol not found: " + varName);
         }
         else if (op == "+" || op == "-" || op == "*" || op == "/" || op == "%") {
             if (!isArithmetic(left) || !isArithmetic(right))
@@ -256,7 +263,7 @@ Type SemanticAnalyzer::getExprType(ASTNode* node) {
         else {
             throw std::runtime_error("Unknown operator: " + op);
         }
-        node->type = result;     // сохраняем тип
+        node->type = result;
         return result;
     }
     else if (UnaryExpr* un = dynamic_cast<UnaryExpr*>(node)) {
@@ -275,7 +282,7 @@ Type SemanticAnalyzer::getExprType(ASTNode* node) {
         else {
             throw std::runtime_error("Unknown unary operator");
         }
-        node->type = result;     // сохраняем тип
+        node->type = result;
         return result;
     }
     else if (CallExpr* call = dynamic_cast<CallExpr*>(node)) {
@@ -289,12 +296,11 @@ Type SemanticAnalyzer::getExprType(ASTNode* node) {
             if (!typeCompatible(sym->params[i].type, argType))
                 throw std::runtime_error("Argument type mismatch in call to " + call->funcName);
         }
-        node->type = sym->type;  // сохраняем тип
+        node->type = sym->type;
         return sym->type;
     }
     else if (ArrayAccessExpr* arr = dynamic_cast<ArrayAccessExpr*>(node)) {
-        IdentifierExpr* id = dynamic_cast<IdentifierExpr*>(arr->array);
-        if (!id) throw std::runtime_error("Array access requires identifier");
+        IdentifierExpr* id = arr->array;
         Symbol* sym = current->lookup(id->name);
         if (!sym) throw std::runtime_error("Undeclared array: " + id->name);
         if (!sym->type.isArray) throw std::runtime_error("Cannot index non-array: " + id->name);
@@ -302,7 +308,8 @@ Type SemanticAnalyzer::getExprType(ASTNode* node) {
         if (!isInteger(idxType)) throw std::runtime_error("Array index must be integer");
         Type elem = sym->type;
         elem.isArray = false;
-        node->type = elem;       // сохраняем тип
+        elem.size = 0;
+        node->type = elem;
         return elem;
     }
     else if (CommaExpr* comm = dynamic_cast<CommaExpr*>(node)) {
@@ -310,28 +317,29 @@ Type SemanticAnalyzer::getExprType(ASTNode* node) {
         for (size_t i = 0; i < comm->exprs.size(); ++i) {
             last = getExprType(comm->exprs[i]);
         }
-        node->type = last;       // сохраняем тип
+        node->type = last;
         return last;
     }
     throw std::runtime_error("Unknown expression type");
 }
 
 bool SemanticAnalyzer::typeCompatible(const Type& left, const Type& right) {
-    if (left.base == right.base && left.isArray == right.isArray) {
+    if (left.isArray && right.isArray) {
+        if (left.base != right.base) return false;
+        if (left.size != right.size && left.size != 0 && right.size != 0) return false;
         return true;
     }
-    // Неявные преобразования между скалярными
-    if (!left.isArray && !right.isArray) {
-        if ((left.base == TYPE_INT && right.base == TYPE_FLOAT) ||
-            (left.base == TYPE_FLOAT && right.base == TYPE_INT))
-            return true;
-        if ((left.base == TYPE_CHAR && right.base == TYPE_INT) ||
-            (left.base == TYPE_INT && right.base == TYPE_CHAR))
-            return true;
-        if ((left.base == TYPE_BOOL && right.base == TYPE_INT) ||
-            (left.base == TYPE_INT && right.base == TYPE_BOOL))
-            return true;
-    }
+    if (left.isArray != right.isArray) return false;
+    if (left.base == right.base) return true;
+    if ((left.base == TYPE_INT && right.base == TYPE_FLOAT) ||
+        (left.base == TYPE_FLOAT && right.base == TYPE_INT))
+        return true;
+    if ((left.base == TYPE_CHAR && right.base == TYPE_INT) ||
+        (left.base == TYPE_INT && right.base == TYPE_CHAR))
+        return true;
+    if ((left.base == TYPE_BOOL && right.base == TYPE_INT) ||
+        (left.base == TYPE_INT && right.base == TYPE_BOOL))
+        return true;
     return false;
 }
 

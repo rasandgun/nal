@@ -11,95 +11,103 @@ enum BasicType { TYPE_INT, TYPE_CHAR, TYPE_BOOL, TYPE_FLOAT, TYPE_VOID };
 struct Type {
     BasicType base;
     bool isArray;
-    Type() : base(TYPE_INT), isArray(false) {}
-    Type(BasicType b, bool arr = false, int sz = 0) : base(b), isArray(arr) {}
+    int size;          // размер для массива (0 для не-массива)
+    Type() : base(TYPE_INT), isArray(false), size(0) {}
+    Type(BasicType b, bool arr = false, int sz = 0) 
+        : base(b), isArray(arr), size(sz) {}
 };
+
 // Базовый класс для всех узлов AST
 class ASTNode {
 public:
     int line, col;
-    Type type; 
+    ASTNode(int l, int c) : line(l), col(c) {}
     virtual ~ASTNode() {}
-    virtual void visit() = 0;
 };
 
+class Expression : public ASTNode {
+public:
+    Type type;
+    Expression(int l, int c) : ASTNode(l, c) {}
+    virtual ~Expression() {}
+};
 
 // Литерал
-class LiteralExpr : public ASTNode {
+class LiteralExpr : public Expression {
 public:
     enum Kind { LIT_INT, LIT_FLOAT, LIT_CHAR, LIT_STRING, LIT_BOOL };
     Kind kind;
-    void visit() override {}
-    std::string value; // храним как строку для простоты
-    LiteralExpr(Kind k, const std::string& v, int l, int c) : kind(k), value(v) { line = l; col = c; }
+    std::string value;
+    LiteralExpr(Kind k, const std::string& v, int l, int c) 
+        : Expression(l, c), kind(k), value(v) {}
 };
 
 // Идентификатор
-class IdentifierExpr : public ASTNode {
+class IdentifierExpr : public Expression {
 public:
-    void visit() override {}
     std::string name;
-    IdentifierExpr(const std::string& n, int l, int c) : name(n) { line = l; col = c; }
+    IdentifierExpr(const std::string& n, int l, int c) 
+        : Expression(l, c), name(n) {}
 };
 
 // Доступ к элементу массива (одномерный)
-class ArrayAccessExpr : public ASTNode {
+class ArrayAccessExpr : public Expression {
 public:
-    void visit() override {}
     IdentifierExpr* array;
-    ASTNode* index;
-    ArrayAccessExpr(IdentifierExpr* arr, ASTNode* idx, int l, int c) : array(arr), index(idx) { line = l; col = c; }
+    Expression* index;
+    ArrayAccessExpr(IdentifierExpr* arr, Expression* idx, int l, int c) 
+        : Expression(l, c), array(arr), index(idx) {}
     ~ArrayAccessExpr() { delete array; delete index; }
 };
 
 // Вызов функции
-class CallExpr : public ASTNode {
+class CallExpr : public Expression {
 public:
-    void visit() override {}
     std::string funcName;
-    std::vector<ASTNode*> args;
-    CallExpr(const std::string& name, const std::vector<ASTNode*>& a, int l, int c) : funcName(name), args(a) { line = l; col = c; }
+    std::vector<Expression*> args;
+    CallExpr(const std::string& name, const std::vector<Expression*>& a, int l, int c) 
+        : Expression(l, c), funcName(name), args(a) {}
     ~CallExpr() { for (size_t i = 0; i < args.size(); ++i) delete args[i]; }
 };
 
 // Унарное выражение
-class UnaryExpr : public ASTNode {
+class UnaryExpr : public Expression {
 public:
-    void visit() override {}
     std::string op;
-    ASTNode* operand;
-    UnaryExpr(const std::string& o, ASTNode* opnd, int l, int c) : op(o), operand(opnd) { line = l; col = c; }
+    Expression* operand;
+    UnaryExpr(const std::string& o, Expression* opnd, int l, int c) 
+        : Expression(l, c), op(o), operand(opnd) {}
     ~UnaryExpr() { delete operand; }
 };
 
 // Бинарное выражение
-class BinaryExpr : public ASTNode {
+class BinaryExpr : public Expression {
 public:
-    void visit() override {}
     std::string op;
-    ASTNode* left;
-    ASTNode* right;
-    BinaryExpr(const std::string& o, ASTNode* l, ASTNode* r, int lc, int cc) : op(o), left(l), right(r) { line = lc; col = cc; }
+    Expression* left;
+    Expression* right;
+    BinaryExpr(const std::string& o, Expression* l, Expression* r, int lc, int cc) 
+        : Expression(lc, cc), op(o), left(l), right(r) {}
     ~BinaryExpr() { delete left; delete right; }
 };
 
 // Выражение-запятая
-class CommaExpr : public ASTNode {
+class CommaExpr : public Expression {
 public:
-    void visit() override {}
-    std::vector<ASTNode*> exprs;
-    CommaExpr(const std::vector<ASTNode*>& e, int l, int c) : exprs(e) { line = l; col = c; }
+    std::vector<Expression*> exprs;
+    CommaExpr(const std::vector<Expression*>& e, int l, int c) 
+        : Expression(l, c), exprs(e) {}
     ~CommaExpr() { for (size_t i = 0; i < exprs.size(); ++i) delete exprs[i]; }
 };
 
 // Объявление переменной
 class VarDecl : public ASTNode {
 public:
-    void visit() override {}
     std::string name;
     Type type;
-    ASTNode* init; // может быть NULL
-    VarDecl(const std::string& n, const Type& t, ASTNode* i, int l, int c) : name(n), type(t), init(i) { line = l; col = c; }
+    Expression* init;
+    VarDecl(const std::string& n, const Type& t, Expression* i, int l, int c) 
+        : ASTNode(l, c), name(n), type(t), init(i) {}
     ~VarDecl() { delete init; }
 };
 
@@ -113,108 +121,103 @@ struct Parameter {
 // Объявление функции
 class FunctionDecl : public ASTNode {
 public:
-    void visit() override {}
     std::string name;
     Type returnType;
     std::vector<Parameter> params;
-    ASTNode* body; // блок
+    ASTNode* body;
     FunctionDecl(const std::string& n, const Type& ret, const std::vector<Parameter>& p, ASTNode* b, int l, int c)
-        : name(n), returnType(ret), params(p), body(b) { line = l; col = c; }
+        : ASTNode(l, c), name(n), returnType(ret), params(p), body(b) {}
     ~FunctionDecl() { delete body; }
 };
 
 // Блок (составной оператор)
 class BlockStmt : public ASTNode {
 public:
-    void visit() override {}
     std::vector<ASTNode*> statements;
-    BlockStmt(const std::vector<ASTNode*>& stmts, int l, int c) : statements(stmts) { line = l; col = c; }
+    BlockStmt(const std::vector<ASTNode*>& stmts, int l, int c) 
+        : ASTNode(l, c), statements(stmts) {}
     ~BlockStmt() { for (size_t i = 0; i < statements.size(); ++i) delete statements[i]; }
 };
 
 // Оператор-выражение
 class ExprStmt : public ASTNode {
 public:
-    void visit() override {}
-    ASTNode* expr;
-    ExprStmt(ASTNode* e, int l, int c) : expr(e) { line = l; col = c; }
+    Expression* expr;
+    ExprStmt(Expression* e, int l, int c) 
+        : ASTNode(l, c), expr(e) {}
     ~ExprStmt() { delete expr; }
 };
 
 // If-else
 class IfStmt : public ASTNode {
 public:
-    void visit() override {}
-    ASTNode* condition;
+    Expression* condition;
     ASTNode* thenBranch;
-    ASTNode* elseBranch; // может быть NULL
-    IfStmt(ASTNode* cond, ASTNode* thenb, ASTNode* elseb, int l, int c)
-        : condition(cond), thenBranch(thenb), elseBranch(elseb) { line = l; col = c; }
+    ASTNode* elseBranch;
+    IfStmt(Expression* cond, ASTNode* thenb, ASTNode* elseb, int l, int c)
+        : ASTNode(l, c), condition(cond), thenBranch(thenb), elseBranch(elseb) {}
     ~IfStmt() { delete condition; delete thenBranch; delete elseBranch; }
 };
 
 // While
 class WhileStmt : public ASTNode {
 public:
-    void visit() override {}
-    ASTNode* condition;
+    Expression* condition;
     ASTNode* body;
-    WhileStmt(ASTNode* cond, ASTNode* b, int l, int c) : condition(cond), body(b) { line = l; col = c; }
+    WhileStmt(Expression* cond, ASTNode* b, int l, int c) 
+        : ASTNode(l, c), condition(cond), body(b) {}
     ~WhileStmt() { delete condition; delete body; }
 };
 
 // Do-while
 class DoWhileStmt : public ASTNode {
 public:
-    void visit() override {}
     ASTNode* body;
-    ASTNode* condition;
-    DoWhileStmt(ASTNode* b, ASTNode* cond, int l, int c) : body(b), condition(cond) { line = l; col = c; }
+    Expression* condition;
+    DoWhileStmt(ASTNode* b, Expression* cond, int l, int c) 
+        : ASTNode(l, c), body(b), condition(cond) {}
     ~DoWhileStmt() { delete body; delete condition; }
 };
 
 // For
 class ForStmt : public ASTNode {
 public:
-    void visit() override {}
-    ASTNode* init;   // может быть VarDecl или ExprStmt (или NULL)
-    ASTNode* condition;
-    ASTNode* update;
+    ASTNode* init;
+    Expression* condition;
+    Expression* update;
     ASTNode* body;
-    ForStmt(ASTNode* i, ASTNode* cond, ASTNode* upd, ASTNode* b, int l, int c)
-        : init(i), condition(cond), update(upd), body(b) { line = l; col = c; }
+    ForStmt(ASTNode* i, Expression* cond, Expression* upd, ASTNode* b, int l, int c)
+        : ASTNode(l, c), init(i), condition(cond), update(upd), body(b) {}
     ~ForStmt() { delete init; delete condition; delete update; delete body; }
 };
 
 // Return
 class ReturnStmt : public ASTNode {
 public:
-    void visit() override {}
-    ASTNode* expr; // может быть NULL
-    ReturnStmt(ASTNode* e, int l, int c) : expr(e) { line = l; col = c; }
+    Expression* expr;
+    ReturnStmt(Expression* e, int l, int c) 
+        : ASTNode(l, c), expr(e) {}
     ~ReturnStmt() { delete expr; }
 };
 
 // Break
 class BreakStmt : public ASTNode {
 public:
-    void visit() override {}
-    BreakStmt(int l, int c) { line = l; col = c; }
+    BreakStmt(int l, int c) : ASTNode(l, c) {}
 };
 
 // Continue
 class ContinueStmt : public ASTNode {
 public:
-    void visit() override {}
-    ContinueStmt(int l, int c) { line = l; col = c; }
+    ContinueStmt(int l, int c) : ASTNode(l, c) {}
 };
 
 // Программа
 class Program : public ASTNode {
 public:
-    void visit() override {}
     std::vector<ASTNode*> declarations;
-    Program(const std::vector<ASTNode*>& decls, int l, int c) : declarations(decls) { line = l; col = c; }
+    Program(const std::vector<ASTNode*>& decls, int l, int c) 
+        : ASTNode(l, c), declarations(decls) {}
     ~Program() { for (size_t i = 0; i < declarations.size(); ++i) delete declarations[i]; }
 };
 

@@ -11,7 +11,6 @@ private:
     // Внутренние структуры для таблицы символов
     struct Symbol {
         Type type;
-        bool initialized;
         bool isFunction;
         std::vector<Parameter> params;
     };
@@ -22,7 +21,6 @@ private:
         void declare(const std::string& name, const Type& type, bool isFunc = false, const std::vector<Parameter>& params = std::vector<Parameter>());
         void define(const std::string& name);
         Symbol* lookup(const std::string& name);
-        bool isInitialized(const std::string& name);
         Type* getType(const std::string& name);
         bool isFunction(const std::string& name);
         std::vector<Parameter>* getParams(const std::string& name);
@@ -41,7 +39,7 @@ private:
     // Вспомогательные методы
     void collectDeclarations(Program* prog);
     void analyzeNode(ASTNode* node);
-    Type getExprType(ASTNode* node);
+    Type getExprType(Expression* node);
     bool typeCompatible(const Type& left, const Type& right);
     bool isScalar(const Type& t);
     bool isArithmetic(const Type& t);

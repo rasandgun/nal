@@ -52,17 +52,17 @@ private:
     DoWhileStmt* doWhileStatement();
     ReturnStmt* returnStatement();
 
-    ASTNode* expression();
-    ASTNode* assignment();
-    ASTNode* logicalOr();
-    ASTNode* logicalAnd();
-    ASTNode* equality();
-    ASTNode* relational();
-    ASTNode* additive();
-    ASTNode* multiplicative();
-    ASTNode* unary();
-    ASTNode* primary();
-    std::vector<ASTNode*> arguments();
+    Expression* expression();
+    Expression* assignment();
+    Expression* logicalOr();
+    Expression* logicalAnd();
+    Expression* equality();
+    Expression* relational();
+    Expression* additive();
+    Expression* multiplicative();
+    Expression* unary();
+    Expression* primary();
+    std::vector<Expression*> arguments();
 };
 
 #endif
