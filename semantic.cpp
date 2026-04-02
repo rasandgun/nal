@@ -67,6 +67,10 @@ SemanticAnalyzer::SemanticAnalyzer() {
     inLoop = false;
 }
 
+SemanticAnalyzer::~SemanticAnalyzer() {
+    delete global;
+}
+
 void SemanticAnalyzer::analyze(Program* program) {
     // Сначала собираем все объявления функций (и глобальных переменных)
     collectDeclarations(program);
@@ -79,8 +83,6 @@ void SemanticAnalyzer::collectDeclarations(Program* prog) {
         ASTNode* node = prog->declarations[i];
         if (FunctionDecl* func = dynamic_cast<FunctionDecl*>(node)) {
             global->declare(func->name, func->returnType, true, func->params);
-        } else if (VarDecl* var = dynamic_cast<VarDecl*>(node)) {
-            global->declare(var->name, var->type, false);
         }
     }
 }
@@ -92,8 +94,6 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
             analyzeNode(prog->declarations[i]);
         }
     } else if (FunctionDecl* func = dynamic_cast<FunctionDecl*>(node)) {
-        // Создаём новую область
-        Scope* prev = current;
         current = current->pushScope();
         // Добавляем параметры
         for (size_t i = 0; i < func->params.size(); ++i) {
@@ -124,7 +124,6 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
             current->define(var->name);
         }
     } else if (BlockStmt* block = dynamic_cast<BlockStmt*>(node)) {
-        Scope* prev = current;
         current = current->pushScope();
         for (size_t i = 0; i < block->statements.size(); ++i) {
             analyzeNode(block->statements[i]);
@@ -152,6 +151,8 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
         Type condType = getExprType(dw->condition);
         if (!isScalar(condType)) throw std::runtime_error("Condition must be scalar");
     } else if (ForStmt* fr = dynamic_cast<ForStmt*>(node)) {
+        Scope *prev = current;
+        current = current->pushScope();
         if (fr->init) analyzeNode(fr->init);
         if (fr->condition) {
             Type condType = getExprType(fr->condition);
@@ -192,9 +193,10 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
     } else if (IdentifierExpr* id = dynamic_cast<IdentifierExpr*>(node)) {
         getExprType(id);
     } else if (LiteralExpr* lit = dynamic_cast<LiteralExpr*>(node)) {
-        // nothing
+        // do nothing
     } else {
         // unknown node
+        throw std::runtime_error("Unknown node type");
     }
 }
 
@@ -217,7 +219,7 @@ Type SemanticAnalyzer::getExprType(Expression* node) {
             case LiteralExpr::LIT_INT:    t = Type(TYPE_INT); break;
             case LiteralExpr::LIT_FLOAT:  t = Type(TYPE_FLOAT); break;
             case LiteralExpr::LIT_CHAR:   t = Type(TYPE_CHAR); break;
-            case LiteralExpr::LIT_STRING: t = Type(TYPE_CHAR, true, 0); break;
+            case LiteralExpr::LIT_STRING: t = Type(TYPE_CHAR, true, lit->value.size()); break;
             case LiteralExpr::LIT_BOOL:   t = Type(TYPE_BOOL); break;
         }
         node->type = t;
@@ -326,7 +328,7 @@ Type SemanticAnalyzer::getExprType(Expression* node) {
 bool SemanticAnalyzer::typeCompatible(const Type& left, const Type& right) {
     if (left.isArray && right.isArray) {
         if (left.base != right.base) return false;
-        if (left.size != right.size && left.size != 0 && right.size != 0) return false;
+        if (left.size != right.size) return false;
         return true;
     }
     if (left.isArray != right.isArray) return false;

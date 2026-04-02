@@ -73,7 +73,6 @@ Token Lexer::readIdentifierOrKeyword() {
     }
     return makeToken(TOK_IDENTIFIER, ident);
 }
-
 Token Lexer::readString() {
     std::string str;
     advance(); // пропускаем "
