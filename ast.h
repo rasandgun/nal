@@ -48,6 +48,12 @@ struct Type {
      */
     Type(BasicType b, bool arr = false, int sz = 0) 
         : base(b), isArray(arr), size(sz) {}
+    bool operator==(const Type& rhs) const {
+        return base == rhs.base && rhs.isArray == isArray && size == rhs.size;
+    };
+    bool operator!=(const Type& rhs) const {
+        return base != rhs.base || rhs.isArray != isArray || size != rhs.size;
+    };
 };
 
 /**

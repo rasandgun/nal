@@ -16,7 +16,6 @@
  * std::vector<Token> tokens = lexer.tokenize();
  * Parser parser(tokens);
  * Program* ast = parser.parse();
- * @endcode
  * 
  * @note При обнаружении синтаксической ошибки выбрасывается std::runtime_error
  * @date 2026-04-02

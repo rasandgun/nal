@@ -9,7 +9,6 @@ Token& Parser::previous() { return tokens[pos - 1]; }
 bool Parser::isAtEnd() const { return peek().type == TOK_EOF; }
 void Parser::advance() { if (!isAtEnd()) pos++; }
 
-// === Проверка по значению ===
 bool Parser::match(const std::string& value) {
     if (check(value)) {
         advance();
@@ -34,7 +33,6 @@ Token Parser::consume(const std::string& value, const std::string& msg) {
     return dummy;
 }
 
-// === Проверка по типу ===
 bool Parser::matchType(TokenType type) {
     if (checkType(type)) {
         advance();
@@ -59,7 +57,6 @@ Token Parser::consumeType(TokenType type, const std::string& msg) {
     return dummy;
 }
 
-// === Удобные обёртки ===
 Token Parser::consumeIdentifier(const std::string& msg) {
     return consumeType(TOK_IDENTIFIER, msg);
 }
@@ -73,7 +70,6 @@ void Parser::error(const Token& tok, const std::string& msg) {
                              std::to_string(tok.col) + " - " + msg);
 }
 
-// ==================== Грамматические правила ====================
 
 Program* Parser::parse() { return program(); }
 
@@ -94,7 +90,7 @@ ASTNode* Parser::declaration() {
 }
 
 VarDecl* Parser::varDeclaration() {
-    int line = previous().line, col = previous().col; // 'let'
+    int line = previous().line, col = previous().col;
     Token id = consumeIdentifier("Expected identifier");
     consume(":", "Expected ':'");
     Type type = typeSpecifier();
@@ -119,9 +115,8 @@ Type Parser::typeSpecifier() {
     bool isArray = false;
     int arraySize = 0;
     if (check("[")) {
-        advance(); // съедаем '['
+        advance();
         isArray = true;
-        // Парсим размер массива
         if (checkType(TOK_INTEGER)) {
             Token sizeToken = consumeType(TOK_INTEGER, "Expected array size");
             arraySize = std::stoi(sizeToken.value);
@@ -137,7 +132,7 @@ Type Parser::typeSpecifier() {
 }
 
 FunctionDecl* Parser::funDeclaration() {
-    int line = previous().line, col = previous().col; // 'fun'
+    int line = previous().line, col = previous().col;
     Token id = consumeIdentifier("Expected function name");
     consume("(", "Expected '('");
     std::vector<Parameter> params = parameters();
@@ -150,7 +145,7 @@ FunctionDecl* Parser::funDeclaration() {
 
 std::vector<Parameter> Parser::parameters() {
     std::vector<Parameter> params;
-    if (check(")")) return params; // нет параметров
+    if (check(")")) return params;
     while (true) {
         Token id = consumeIdentifier("Expected parameter name");
         consume(":", "Expected ':'");

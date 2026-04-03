@@ -61,7 +61,6 @@ Token Lexer::readIdentifierOrKeyword() {
         ident += current();
         advance();
     }
-    // Список ключевых слов
     static const char* keywords[] = {
         "let", "fun", "if", "else", "for", "while", "do", "return",
         "int", "char", "bool", "void", "float", "true", "false",
@@ -91,11 +90,11 @@ Token Lexer::readString() {
 }
 
 Token Lexer::readChar() {
-    advance(); // пропускаем '
+    advance();
     char ch = current();
     advance();
     if (current() != '\'') throw std::runtime_error("Invalid char literal");
-    advance(); // пропускаем '
+    advance();
     return makeToken(TOK_CHAR, std::string(1, ch));
 }
 
@@ -103,8 +102,6 @@ Token Lexer::readOperatorOrDelimiter() {
     std::string op;
     op += current();
     advance();
-
-    // Двухсимвольные операторы
     std::string two = op + current();
     if (two == "==" || two == "!=" || two == "<=" || two == ">=" ||
         two == "&&" || two == "||" || two == "*=" || two == "/=" ||
@@ -112,8 +109,6 @@ Token Lexer::readOperatorOrDelimiter() {
         op = two;
         advance();
     }
-
-    // Проверка на разделитель (односимвольный)
     static const std::string delimiters = ";,(){}[]:";
     if (op.size() == 1 && delimiters.find(op[0]) != std::string::npos)
         return makeToken(TOK_DELIMITER, op);

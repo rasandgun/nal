@@ -5,7 +5,6 @@
 #include "parser.h"
 #include "semantic.h"
 
-// Простая функция вывода AST (упрощённая, можно расширить)
 void printAST(ASTNode* node, int indent = 0) {
     if (!node) return;
     for (int i = 0; i < indent; ++i) std::cout << "  ";

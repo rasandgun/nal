@@ -2,11 +2,9 @@
 #include <stdexcept>
 #include <map>
 
-// ----- Scope -----
 SemanticAnalyzer::Scope::Scope(Scope* p) : parent(p) {}
 
 SemanticAnalyzer::Scope::~Scope() {
-    // не удаляем parent, он управляется внешне
 }
 
 void SemanticAnalyzer::Scope::declare(const std::string& name, const Type& type, bool isFunc, const std::vector<Parameter>& params) {
@@ -72,9 +70,7 @@ SemanticAnalyzer::~SemanticAnalyzer() {
 }
 
 void SemanticAnalyzer::analyze(Program* program) {
-    // Сначала собираем все объявления функций (и глобальных переменных)
     collectDeclarations(program);
-    // Затем анализируем тела
     analyzeNode(program);
 }
 
@@ -94,20 +90,21 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
             analyzeNode(prog->declarations[i]);
         }
     } else if (FunctionDecl* func = dynamic_cast<FunctionDecl*>(node)) {
+        foundReturn = false;
         current = current->pushScope();
-        // Добавляем параметры
         for (size_t i = 0; i < func->params.size(); ++i) {
             Parameter& p = func->params[i];
             current->declare(p.name, p.type);
-            current->define(p.name); // параметры инициализированы
+            current->define(p.name);
         }
         Type prevRet = currentReturnType;
         currentReturnType = func->returnType;
         bool prevLoop = inLoop;
         inLoop = false;
-        // Анализируем тело
         analyzeNode(func->body);
-        // Восстанавливаем
+        if (func->returnType != Type(TYPE_VOID) && !foundReturn) {
+            throw std::runtime_error("Couldn't find return statement in function " + func->name);
+        }
         currentReturnType = prevRet;
         inLoop = prevLoop;
         current = current->popScope();
@@ -164,6 +161,7 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
         analyzeNode(fr->body);
         inLoop = prevLoop;
     } else if (ReturnStmt* ret = dynamic_cast<ReturnStmt*>(node)) {
+        foundReturn = true;
         if (currentReturnType.base == TYPE_VOID) {
             if (ret->expr) throw std::runtime_error("Return with value in void function");
         } else {
