@@ -23,6 +23,8 @@ var hierarchy =
       [ "VarDecl", "classVarDecl.html", null ],
       [ "WhileStmt", "classWhileStmt.html", null ]
     ] ],
+    [ "CodeGenerator", "classCodeGenerator.html", null ],
+    [ "Command", "structCommand.html", null ],
     [ "Lexer", "classLexer.html", null ],
     [ "Parameter", "structParameter.html", null ],
     [ "SemanticAnalyzer", "classSemanticAnalyzer.html", null ],
