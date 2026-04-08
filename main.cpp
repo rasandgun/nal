@@ -4,6 +4,92 @@
 #include "lexer.h"
 #include "parser.h"
 #include "semantic.h"
+#include "codegen.h"
+
+
+
+std::string typeToString(const Type& t) {
+    std::string base;
+    switch (t.base) {
+        case TYPE_INT: base = "int"; break;
+        case TYPE_CHAR: base = "char"; break;
+        case TYPE_BOOL: base = "bool"; break;
+        case TYPE_FLOAT: base = "float"; break;
+        case TYPE_VOID: base = "void"; break;
+        default: base = "unknown";
+    }
+    if (t.isArray) {
+        base += "[" + std::to_string(t.size) + "]";
+    }
+    return base;
+}
+
+void printCommand(const Command& cmd) {
+    switch (cmd.inst) {
+        case ADD: std::cout << "ADD"; break;
+        case SUB: std::cout << "SUB"; break;
+        case MUL: std::cout << "MUL"; break;
+        case DIV: std::cout << "DIV"; break;
+        case MOD: std::cout << "MOD"; break;
+        case NEG: std::cout << "NEG"; break;
+        case GREATER: std::cout << "GREATER"; break;
+        case LESS: std::cout << "LESS"; break;
+        case GE: std::cout << "GE"; break;
+        case LE: std::cout << "LE"; break;
+        case EQ: std::cout << "EQ"; break;
+        case NE: std::cout << "NE"; break;
+        case AND: std::cout << "AND"; break;
+        case OR: std::cout << "OR"; break;
+        case NOT: std::cout << "NOT"; break;
+        case POP: std::cout << "POP"; break;
+        case PUSH:
+            std::cout << "PUSH ";
+            if (!cmd.argName.empty())
+                std::cout << cmd.argName;
+            else
+                std::cout << cmd.intArg;
+            break;
+        case LOAD:
+            std::cout << "LOAD " << cmd.argName;
+            break;
+        case LOAD_ARRAY:
+            std::cout << "LOAD_ARRAY " << cmd.argName;
+            break;
+        case STORE_ARRAY:
+            std::cout << "STORE_ARRAY " << cmd.argName;
+            break;
+        case JUMP:
+            std::cout << "JUMP " << cmd.intArg;
+            break;
+        case JUMPIFTRUE:
+            std::cout << "JUMPIFTRUE " << cmd.intArg;
+            break;
+        case JUMPIFFALSE:
+            std::cout << "JUMPIFFALSE " << cmd.intArg;
+            break;
+        case SCOPEOPEN:
+            std::cout << "SCOPEOPEN";
+            break;
+        case DECLAREVAR:
+            std::cout << "DECLAREVAR " << cmd.argName << " " << typeToString(cmd.argType);
+            break;
+        case SCOPEPOP:
+            std::cout << "SCOPEPOP";
+            break;
+        case CALL:
+            std::cout << "CALL " << cmd.argName;
+            break;
+        case RET:
+            std::cout << "RET";
+            break;
+        case ASSIGN:
+            std::cout << "ASSIGN " << cmd.argName;
+            break;
+        default:
+            std::cout << "UNKNOWN";
+    }
+    std::cout << std::endl;
+}
 
 void printAST(ASTNode* node, int indent = 0) {
     if (!node) return;
@@ -125,6 +211,7 @@ void printAST(ASTNode* node, int indent = 0) {
 }
 
 int main(int argc, char* argv[]) {
+    std::cout << argv[0] << std::endl;
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <source file>\n";
         return 1;
@@ -152,10 +239,18 @@ int main(int argc, char* argv[]) {
         SemanticAnalyzer sem;
         sem.analyze(ast);
 
-        std::cout << "AST:\n";
         printAST(ast);
-
-        delete ast; // освобождаем память
+        // освобождаем память
+        CodeGenerator cg(ast);
+        try {
+            cg.generate();
+        } catch (const std::exception(&e)) {
+            std::cout << e.what() << std::endl;
+        }
+        for (auto command : cg.commands) {
+            printCommand(command);
+        }
+        delete ast; 
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << "\n";
         return 1;
