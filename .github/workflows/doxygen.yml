@@ -1,0 +1,33 @@
+name: Deploy Doxygen to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Set this to your default branch
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install doxygen graphviz -y
+
+      - name: Build Documentation
+        run: doxygen Doxyfile
+
+      - name: Add .nojekyll
+        run: touch docs/html/.nojekyll # Prevents GitHub Pages from ignoring folders starting with underscores
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs/html  # Must match the path where Doxygen generates HTML
+          branch: gh-pages   # The branch to deploy documentation to

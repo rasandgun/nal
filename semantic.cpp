@@ -58,7 +58,6 @@ SemanticAnalyzer::Scope* SemanticAnalyzer::Scope::popScope() {
     return newCurrent;
 }
 
-// ----- SemanticAnalyzer -----
 SemanticAnalyzer::SemanticAnalyzer() {
     global = new Scope();
     current = global;
@@ -177,7 +176,7 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
     } else if (ExprStmt* es = dynamic_cast<ExprStmt*>(node)) {
         if (es->expr) getExprType(es->expr);
     } else if (BinaryExpr* bin = dynamic_cast<BinaryExpr*>(node)) {
-        getExprType(bin); // для побочных эффектов (проверка типов)
+        getExprType(bin);
     } else if (UnaryExpr* un = dynamic_cast<UnaryExpr*>(node)) {
         getExprType(un);
     } else if (CommaExpr* comm = dynamic_cast<CommaExpr*>(node)) {
@@ -198,12 +197,10 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
     }
 }
 
-// Вспомогательная функция: получить имя базовой переменной для lvalue
 static std::string getLValueName(Expression* expr) {
     if (IdentifierExpr* id = dynamic_cast<IdentifierExpr*>(expr)) {
         return id->name;
     } else if (ArrayAccessExpr* arr = dynamic_cast<ArrayAccessExpr*>(expr)) {
-        // arr->array — это IdentifierExpr
         return arr->array->name;
     } else {
         throw std::runtime_error("Expression is not a valid lvalue");

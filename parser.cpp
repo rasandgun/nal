@@ -191,7 +191,6 @@ ASTNode* Parser::statement() {
         consume(";", "Expected ';'");
         return new ContinueStmt(l, c);
     }
-    // иначе это выражение-оператор
     Expression* expr = expression();
     consume(";", "Expected ';'");
     return new ExprStmt(expr, expr->line, expr->col);
@@ -266,7 +265,6 @@ ReturnStmt* Parser::returnStatement() {
     return new ReturnStmt(expr, line, col);
 }
 
-// === Выражения ===
 Expression* Parser::expression() {
     Expression* left = assignment();
     if (match(",")) {
@@ -282,7 +280,6 @@ Expression* Parser::expression() {
 
 Expression* Parser::assignment() {
     Expression* left = logicalOr();
-    // операторы присваивания: =, *=, /=, %=, +=, -=
     if (match("=") || match("*=") || match("/=") || match("%=") || match("+=") || match("-=")) {
         std::string op = previous().value;
         Expression* right = assignment();
@@ -377,7 +374,7 @@ Expression* Parser::primary() {
             consume(")", "Expected ')'");
             return new CallExpr(name, args, l, c);
         } else if (check("[")) {
-            advance(); // '['
+            advance();
             Expression* idx = expression();
             consume("]", "Expected ']'");
             return new ArrayAccessExpr(new IdentifierExpr(name, l, c), idx, l, c);
