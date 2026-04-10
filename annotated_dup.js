@@ -1,5 +1,6 @@
 var annotated_dup =
 [
+    [ "Array", "structArray.html", null ],
     [ "ArrayAccessExpr", "classArrayAccessExpr.html", "classArrayAccessExpr" ],
     [ "ASTNode", "classASTNode.html", "classASTNode" ],
     [ "BinaryExpr", "classBinaryExpr.html", "classBinaryExpr" ],
@@ -22,10 +23,13 @@ var annotated_dup =
     [ "Parameter", "structParameter.html", "structParameter" ],
     [ "Program", "classProgram.html", "classProgram" ],
     [ "ReturnStmt", "classReturnStmt.html", "classReturnStmt" ],
+    [ "Runner", "classRunner.html", null ],
     [ "SemanticAnalyzer", "classSemanticAnalyzer.html", "classSemanticAnalyzer" ],
+    [ "TID", "classTID.html", "classTID" ],
     [ "Token", "structToken.html", null ],
     [ "Type", "structType.html", "structType" ],
     [ "UnaryExpr", "classUnaryExpr.html", "classUnaryExpr" ],
+    [ "Value", "structValue.html", null ],
     [ "VarDecl", "classVarDecl.html", "classVarDecl" ],
     [ "WhileStmt", "classWhileStmt.html", "classWhileStmt" ]
 ];

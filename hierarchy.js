@@ -1,5 +1,6 @@
 var hierarchy =
 [
+    [ "Array", "structArray.html", null ],
     [ "ASTNode", "classASTNode.html", [
       [ "BlockStmt", "classBlockStmt.html", null ],
       [ "BreakStmt", "classBreakStmt.html", null ],
@@ -26,8 +27,14 @@ var hierarchy =
     [ "CodeGenerator", "classCodeGenerator.html", null ],
     [ "Command", "structCommand.html", null ],
     [ "Lexer", "classLexer.html", null ],
+    [ "TID< T >::node", "structTID_1_1node.html", null ],
     [ "Parameter", "structParameter.html", null ],
+    [ "Runner", "classRunner.html", null ],
     [ "SemanticAnalyzer", "classSemanticAnalyzer.html", null ],
+    [ "TID< T >", "classTID.html", null ],
+    [ "TID< Array >", "classTID.html", null ],
+    [ "TID< Value >", "classTID.html", null ],
     [ "Token", "structToken.html", null ],
-    [ "Type", "structType.html", null ]
+    [ "Type", "structType.html", null ],
+    [ "Value", "structValue.html", null ]
 ];
