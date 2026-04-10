@@ -58,10 +58,20 @@ SemanticAnalyzer::Scope* SemanticAnalyzer::Scope::popScope() {
     return newCurrent;
 }
 
+void SemanticAnalyzer::declareBuiltins() {
+    global->declare("read_int", Type(TYPE_INT), true, {});
+    global->declare("read_float", Type(TYPE_FLOAT), true, {});
+    global->declare("read_char", Type(TYPE_CHAR), true, {});
+    global->declare("print_char", Type(TYPE_VOID), true, {{"_X", Type(TYPE_CHAR), -1, -1}});
+    global->declare("print_int", Type(TYPE_VOID), true, {{"_X", Type(TYPE_INT), -1, -1}});
+    global->declare("print_float", Type(TYPE_VOID), true, {{"_X", Type(TYPE_FLOAT), -1, -1}});
+}
+
 SemanticAnalyzer::SemanticAnalyzer() {
     global = new Scope();
     current = global;
     inLoop = false;
+    declareBuiltins();
 }
 
 SemanticAnalyzer::~SemanticAnalyzer() {
@@ -91,8 +101,10 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
     } else if (FunctionDecl* func = dynamic_cast<FunctionDecl*>(node)) {
         foundReturn = false;
         current = current->pushScope();
+        if (func->returnType.isArray) throw std::runtime_error("A function can't return an array");
         for (size_t i = 0; i < func->params.size(); ++i) {
             Parameter& p = func->params[i];
+            if (p.type.isArray) throw std::runtime_error("A function can't take an array as an argument");
             current->declare(p.name, p.type);
             current->define(p.name);
         }
@@ -108,9 +120,6 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node) {
         inLoop = prevLoop;
         current = current->popScope();
     } else if (VarDecl* var = dynamic_cast<VarDecl*>(node)) {
-        if (current->lookup(var->name) != nullptr) {
-            throw std::runtime_error("Variable already declared: " + var->name);
-        }
         current->declare(var->name, var->type);
         if (var->init) {
             Type initType = getExprType(var->init);

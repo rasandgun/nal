@@ -257,6 +257,7 @@ private:
      * Используется для индексов массивов.
      */
     bool isInteger(const Type& t);
+    void declareBuiltins();
 };
 
 #endif

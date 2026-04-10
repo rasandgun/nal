@@ -6,7 +6,22 @@
 #include <vector>
 #include <stack>
 #include <stdexcept>
+#include <iostream>
 #include "ast.h"
+struct Value {
+    BasicType type;
+    union {
+        double f64;
+        int i32;
+        char byte;
+        bool bit;
+    };
+    Value(double x) : type(TYPE_FLOAT), f64(x) {}
+    Value(int x)    : type(TYPE_INT),   i32(x) {}
+    Value(char x)   : type(TYPE_CHAR), byte(x) {}
+    Value(bool x)   : type(TYPE_BOOL),  bit(x) {} 
+    Value() {}
+};
 
 // Расширенный набор инструкций для полноценной поддержки языка
 enum Instruction {
@@ -52,6 +67,15 @@ enum Instruction {
     CALL,
     RET,
     ASSIGN,     // присвоить значение со стека переменной
+    DUP,            // дублировать вершину стека
+    HALT,
+    READ_INT,
+    READ_FLOAT,
+    READ_CHAR,
+    PRINT_INT,
+    PRINT_FLOAT,
+    PRINT_CHAR,
+    INIT_ARRAY_STRING,
 };
 
 // Команда виртуальной машины с гибкими параметрами
@@ -60,44 +84,50 @@ struct Command {
     // Универсальные поля для хранения аргументов разных типов
     Type argType;               // тип для DECLAREVAR
     std::string argName;        // имя переменной/функции
-    int intArg;                 // целочисленный аргумент (смещение, размер)
-    std::string strArg2;        // дополнительная строка (например, для массива)
-
+    Value argVal;
+    std::string argStr;
     // Конструкторы
-    Command() : inst(POP), intArg(0) {}
-    Command(Instruction i) : inst(i), intArg(0) {}
-    Command(Instruction i, int val) : inst(i), intArg(val) {}
-    Command(Instruction i, const std::string& name) : inst(i), argName(name), intArg(0) {}
-    Command(Instruction i, const Type& t, const std::string& name) : inst(i), argType(t), argName(name), intArg(0) {}
-    // Для работы с массивами: имя массива + возможно что-то ещё
-    Command(Instruction i, const std::string& arrName, const std::string&) : inst(i), argName(arrName), intArg(0) {}
+    Command() : inst(POP), argVal(0) {}
+    Command(Instruction i, const std::string& varName, const std::string& strValue)
+    : inst(i), argName(varName), argStr(strValue) {}
+    Command(Instruction i) : inst(i), argVal(0) {}
+    Command(Instruction i, int val) : inst(i), argVal(val) {}
+    Command(Instruction i, double val) : inst(i), argVal(val){}
+    Command(Instruction i, char val) : inst(i), argVal(val){}
+    Command(Instruction i, bool val) : inst(i), argVal(val){
+    }
+    Command(Instruction i, const std::string& name) : inst(i), argName(name), argVal(0) {
+    }   
+    Command(Instruction i, const char *name) : inst(i), argName(name), argVal(0) {
+    }    
+    Command(Instruction i, const Type& t, const std::string& name) : inst(i), argType(t), argName(name), argVal(0) {}
 };
 
 class CodeGenerator {
 public:
     std::vector<Command> commands;
 
-    CodeGenerator(Program* program) : root(program) {}
+    CodeGenerator(Program* program) : root(program), openedScopes(0) {}
 
-    void generate() {
-        visitNode(root);
-    }
+    void insertGlobalInitCall();
+
+    void generate();
 
     void visitNode(ASTNode* node);
 
     size_t currentInstruction() { return commands.size(); }
+    std::unordered_map<std::string, size_t> functionStart;
 
 private:
     Program* root;
-    std::unordered_map<std::string, size_t> functionStart; // начало функции (адрес первой инструкции)
-
+    
     struct LoopInfo {
         size_t startAddr;                   // адрес начала цикла (для continue)
         std::vector<size_t> breakAddr;      // адреса команд break (нужно заполнить JUMP)
         std::vector<size_t> continueAddr;   // адреса команд continue (нужно заполнить JUMP)
     };
     std::vector<LoopInfo> loopStack;
-
+    size_t openedScopes;
     // Вспомогательный метод для вставки команды с последующей "заплаткой" адреса
     size_t emitPlaceholder(Instruction inst = JUMP) {
         commands.push_back(Command(inst, 0));

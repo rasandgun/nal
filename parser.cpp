@@ -209,12 +209,27 @@ IfStmt* Parser::ifStatement() {
     return new IfStmt(cond, thenBranch, elseBranch, line, col);
 }
 
+ASTNode* Parser::forInit() {
+    if (check("let")) {
+        advance();
+        return varDeclaration();   // varDeclaration сама съест ';'
+    } else if (!check(";")) {
+        Expression* expr = expression();
+        match(";");
+        return new ExprStmt(expr, expr->line, expr->col);
+    }
+    return nullptr; // пустая инициализация
+}
+
 ForStmt* Parser::forStatement() {
     int line = previous().line, col = previous().col;
     consume("(", "Expected '('");
     ASTNode* init = forInit();
-    Expression* cond = expression();
-    consume(";", "Expected ';'");
+    Expression* cond = nullptr;
+    if (!check(";")) {
+        cond = expression();
+    }
+    consume(";", "Expected ';' after for condition");
     Expression* update = nullptr;
     if (!check(")")) {
         update = expression();
@@ -222,17 +237,6 @@ ForStmt* Parser::forStatement() {
     consume(")", "Expected ')'");
     ASTNode* body = block();
     return new ForStmt(init, cond, update, body, line, col);
-}
-
-ASTNode* Parser::forInit() {
-    if (check("let")) {
-        advance();
-        return varDeclaration();
-    } else {
-        Expression* expr = expression();
-        consume(";", "Expected ';'");
-        return new ExprStmt(expr, expr->line, expr->col);
-    }
 }
 
 WhileStmt* Parser::whileStatement() {
