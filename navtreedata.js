@@ -25,6 +25,7 @@
 var NAVTREE =
 [
   [ "NAL", "index.html", [
+    [ "Руководство пользователя языка NAL", "index.html", "index" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],

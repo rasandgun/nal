@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['returnstmt_0',['returnstmt',['../classReturnStmt.html',1,'ReturnStmt'],['../classReturnStmt.html#a55cf86c9a8777353e1fde32a32d7d3a1',1,'ReturnStmt::ReturnStmt()']]],
-  ['returntype_1',['returnType',['../classFunctionDecl.html#a5348944dbe4f7349aaaa4289b43f5871',1,'FunctionDecl']]],
-  ['right_2',['right',['../classBinaryExpr.html#a8f1e63c6e72b96ae0473693df616c171',1,'BinaryExpr']]],
-  ['run_3',['run',['../classRunner.html#a352a9423f54145f34abec68a1570b653',1,'Runner']]],
-  ['runner_4',['runner',['../classRunner.html',1,'Runner'],['../classRunner.html#afda91c9298f190f54b8c79f601a9594e',1,'Runner::Runner()']]]
+  ['elsebranch_0',['elseBranch',['../classIfStmt.html#a8db8f07edcf6933aaf6d668e86ff2b50',1,'IfStmt']]],
+  ['expr_1',['expr',['../classExprStmt.html#a86585ad1af2cf731024f6abe63362177',1,'ExprStmt::expr'],['../classReturnStmt.html#ad33d0eb45bb2cde3c6d1e3ee58b6b1d3',1,'ReturnStmt::expr']]],
+  ['expression_2',['expression',['../classExpression.html',1,'Expression'],['../classExpression.html#acf039598b7a98b7b6c05fba307f4d967',1,'Expression::Expression()']]],
+  ['exprs_3',['exprs',['../classCommaExpr.html#a9d51c056532d5f9509a685839341333e',1,'CommaExpr']]],
+  ['exprstmt_4',['exprstmt',['../classExprStmt.html',1,'ExprStmt'],['../classExprStmt.html#a534352de16848bf53b37ebd967fcf389',1,'ExprStmt::ExprStmt()']]]
 ];

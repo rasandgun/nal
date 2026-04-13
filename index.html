@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>NAL: Main Page</title>
+<title>NAL: Руководство пользователя языка NAL</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -88,10 +88,124 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </div>
 </div>
 
-<div class="header">
-  <div class="headertitle"><div class="title">NAL Documentation</div></div>
+<div><div class="header">
+  <div class="headertitle"><div class="title">Руководство пользователя языка NAL </div></div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p><a class="anchor" id="md_README"></a> </p>
+<h1><a class="anchor" id="autotoc_md1"></a>
+1. Введение</h1>
+<p>NAL (Natural Algorithmic Language) — язык со статической типизацией. Точка входа — функция <code>void main()</code>.</p>
+<p>Комментарии: <code>// текст до конца строки</code>.</p>
+<h1><a class="anchor" id="autotoc_md2"></a>
+2. Типы данных</h1>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Тип   </th><th class="markdownTableHeadNone">Значения   </th><th class="markdownTableHeadNone">Пример    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>int</code>   </td><td class="markdownTableBodyNone">целые числа   </td><td class="markdownTableBodyNone"><code>0</code>, <code>-42</code>, <code>127</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>float</code>   </td><td class="markdownTableBodyNone">числа с плавающей точкой   </td><td class="markdownTableBodyNone"><code>3.14</code>, <code>-0.5</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>char</code>   </td><td class="markdownTableBodyNone">один символ   </td><td class="markdownTableBodyNone">&lsquo;'a&rsquo;<code>,</code>'Z'<code>,</code>'9'<code>\ilinebr &lt;/td&gt; &lt;/tr&gt; &lt;tr class="markdownTableRowEven"&gt; &lt;td class="markdownTableBodyNone"&gt;</code>bool<code>\ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt; логические значения \ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt;</code>true<code>,</code>false<code>\ilinebr &lt;/td&gt; &lt;/tr&gt; &lt;tr class="markdownTableRowOdd"&gt; &lt;td class="markdownTableBodyNone"&gt;</code>void`   </td><td class="markdownTableBodyNone">отсутствие значения (для функций)   </td><td class="markdownTableBodyNone">—   </td></tr>
+</table>
+<h1><a class="anchor" id="autotoc_md3"></a>
+3. Переменные</h1>
+<p>Объявление: <code>let имя : тип = выражение? ;</code></p>
+<div class="fragment"><div class="line">let x: int = 5;</div>
+<div class="line">let y: float;</div>
+<div class="line">let flag: bool = true;</div>
+</div><!-- fragment --><p>Присваивание: <code>x = 10;</code></p>
+<h1><a class="anchor" id="autotoc_md4"></a>
+4. Массивы</h1>
+<p>Объявление массива: <code>тип[]</code></p>
+<p>Доступ к элементу: <code>arr[индекс]</code> (индекс — <code>int</code>)</p>
+<div class="fragment"><div class="line">let arr: int[];</div>
+<div class="line">arr[0] = 42;</div>
+<div class="line">let val: int = arr[0];</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md5"></a>
+5. Функции</h1>
+<p>Определение: </p><div class="fragment"><div class="line">fun имя(параметры): возвращаемый_тип {</div>
+<div class="line">    тело</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Параметр: <code>имя: тип</code></p>
+<p>Точка входа: </p><div class="fragment"><div class="line">fun main(): void {</div>
+<div class="line">    // ...</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Пример: </p><div class="fragment"><div class="line">fun add(a: int, b: int): int {</div>
+<div class="line">    return a + b;</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Вызов: </p><div class="fragment"><div class="line">let result = add(3, 4);</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md6"></a>
+6. Встроенные функции</h1>
+<h2><a class="anchor" id="autotoc_md7"></a>
+Ввод</h2>
+<ul>
+<li><code>read_int(): int</code> — прочитать целое число</li>
+<li><code>read_float(): float</code> — прочитать вещественное</li>
+<li><code>read_char(): char</code> — прочитать символ</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md8"></a>
+Вывод</h2>
+<ul>
+<li><code>print_int(n: int): void</code></li>
+<li><code>print_float(x: float): void</code></li>
+<li><code>print_char(c: char): void</code></li>
+</ul>
+<p>Пример: </p><div class="fragment"><div class="line">let a: int = read_int();</div>
+<div class="line">print_int(a);</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md9"></a>
+7. Операторы</h1>
+<h2><a class="anchor" id="autotoc_md10"></a>
+Арифметические</h2>
+<p><code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>%</code>, унарные <code>+</code>, <code>-</code></p>
+<h2><a class="anchor" id="autotoc_md11"></a>
+Сравнения</h2>
+<p><code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code> (результат — <code>bool</code>)</p>
+<h2><a class="anchor" id="autotoc_md12"></a>
+Логические</h2>
+<p><code>&amp;&amp;</code>, <code>||</code>, <code>!</code> (операнды — <code>bool</code>)</p>
+<h2><a class="anchor" id="autotoc_md13"></a>
+Присваивания</h2>
+<p><code>=</code>, <code>*=</code>, <code>/=</code>, <code>%=</code>, <code>+=</code>, <code>-=</code></p>
+<h1><a class="anchor" id="autotoc_md14"></a>
+8. Управляющие конструкции</h1>
+<h2><a class="anchor" id="autotoc_md15"></a>
+&lt;tt&gt;if&lt;/tt&gt;</h2>
+<div class="fragment"><div class="line">if (условие) {</div>
+<div class="line">    // ...</div>
+<div class="line">} else {</div>
+<div class="line">    // ...</div>
+<div class="line">}</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md16"></a>
+&lt;tt&gt;while&lt;/tt&gt;</h2>
+<div class="fragment"><div class="line">while (условие) {</div>
+<div class="line">    // ...</div>
+<div class="line">}</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md17"></a>
+&lt;tt&gt;do-while&lt;/tt&gt;</h2>
+<div class="fragment"><div class="line">do {</div>
+<div class="line">    // ...</div>
+<div class="line">} while (условие);</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md18"></a>
+&lt;tt&gt;for&lt;/tt&gt;</h2>
+<div class="fragment"><div class="line">for (инициализация; условие; шаг) {</div>
+<div class="line">    // ...</div>
+<div class="line">}</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md19"></a>
+&lt;tt&gt;break&lt;/tt&gt;, &lt;tt&gt;continue&lt;/tt&gt;, &lt;tt&gt;return&lt;/tt&gt;</h2>
+<h1><a class="anchor" id="autotoc_md20"></a>
+9. Пример программы</h1>
+<div class="fragment"><div class="line">fun main(): void {</div>
+<div class="line">    let arr: int[];</div>
+<div class="line">    arr[0] = 10;</div>
+<div class="line">    arr[1] = 20;</div>
+<div class="line">    </div>
+<div class="line">    let sum: int = arr[0] + arr[1];</div>
+<div class="line">    print_int(sum);</div>
+<div class="line">}</div>
+</div><!-- fragment --><hr  />
+ </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

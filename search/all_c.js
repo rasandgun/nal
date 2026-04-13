@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['parameter_0',['Parameter',['../structParameter.html',1,'']]],
-  ['params_1',['params',['../classFunctionDecl.html#aa50fece4332775c1b5e96379574519cf',1,'FunctionDecl']]],
-  ['popscope_2',['popScope',['../classTID.html#ada549e269bb77db2e713ca4d655727ce',1,'TID']]],
-  ['program_3',['program',['../classProgram.html',1,'Program'],['../classProgram.html#aa2029a785015020e12856dbdcd3aad15',1,'Program::Program()']]]
+  ['declarations_0',['declarations',['../classProgram.html#a398a2f2aec0259410a2fec0cb019fa36',1,'Program']]],
+  ['declare_1',['declare',['../classTID.html#a17b19b2f18d01f3bb61555c703f1aef5',1,'TID']]],
+  ['do_20while_20tt_2',['&lt;tt&gt;do-while&lt;/tt&gt;',['../index.html#autotoc_md17',1,'']]],
+  ['dowhilestmt_3',['dowhilestmt',['../classDoWhileStmt.html',1,'DoWhileStmt'],['../classDoWhileStmt.html#ae756420e11f5dd6e6fce12324fa1a5df',1,'DoWhileStmt::DoWhileStmt()']]]
 ];
