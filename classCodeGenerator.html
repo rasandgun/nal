@@ -97,34 +97,135 @@ $(document).ready(function(){initNavTree('classCodeGenerator.html',''); initResi
   <div class="headertitle"><div class="title">CodeGenerator Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Генератор кода для виртуальной машины  
+ <a href="classCodeGenerator.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="codegen_8h_source.html">codegen.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9afd3e079da52ed173af0af275e4c0ca" id="r_a9afd3e079da52ed173af0af275e4c0ca"><td class="memItemLeft" align="right" valign="top"><a id="a9afd3e079da52ed173af0af275e4c0ca" name="a9afd3e079da52ed173af0af275e4c0ca"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>CodeGenerator</b> (<a class="el" href="classProgram.html">Program</a> *program)</td></tr>
+<tr class="memitem:a9afd3e079da52ed173af0af275e4c0ca" id="r_a9afd3e079da52ed173af0af275e4c0ca"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCodeGenerator.html#a9afd3e079da52ed173af0af275e4c0ca">CodeGenerator</a> (<a class="el" href="classProgram.html">Program</a> *program)</td></tr>
+<tr class="memdesc:a9afd3e079da52ed173af0af275e4c0ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Конструктор  <br /></td></tr>
 <tr class="separator:a9afd3e079da52ed173af0af275e4c0ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7de88fa869fc8c5efbf52b4b4b46e896" id="r_a7de88fa869fc8c5efbf52b4b4b46e896"><td class="memItemLeft" align="right" valign="top"><a id="a7de88fa869fc8c5efbf52b4b4b46e896" name="a7de88fa869fc8c5efbf52b4b4b46e896"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>insertGlobalInitCall</b> ()</td></tr>
+<tr class="memdesc:a7de88fa869fc8c5efbf52b4b4b46e896"><td class="mdescLeft">&#160;</td><td class="mdescRight">Вставить вызов глобальной инициализации <br /></td></tr>
 <tr class="separator:a7de88fa869fc8c5efbf52b4b4b46e896"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef4f9c2efe63221d0060f226cd767c0f" id="r_aef4f9c2efe63221d0060f226cd767c0f"><td class="memItemLeft" align="right" valign="top"><a id="aef4f9c2efe63221d0060f226cd767c0f" name="aef4f9c2efe63221d0060f226cd767c0f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>generate</b> ()</td></tr>
+<tr class="memdesc:aef4f9c2efe63221d0060f226cd767c0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Запустить генерацию кода <br /></td></tr>
 <tr class="separator:aef4f9c2efe63221d0060f226cd767c0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abde62e405ddb94a5134ffe95bf6c08aa" id="r_abde62e405ddb94a5134ffe95bf6c08aa"><td class="memItemLeft" align="right" valign="top"><a id="abde62e405ddb94a5134ffe95bf6c08aa" name="abde62e405ddb94a5134ffe95bf6c08aa"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>visitNode</b> (<a class="el" href="classASTNode.html">ASTNode</a> *node)</td></tr>
+<tr class="memitem:abde62e405ddb94a5134ffe95bf6c08aa" id="r_abde62e405ddb94a5134ffe95bf6c08aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCodeGenerator.html#abde62e405ddb94a5134ffe95bf6c08aa">visitNode</a> (<a class="el" href="classASTNode.html">ASTNode</a> *node)</td></tr>
+<tr class="memdesc:abde62e405ddb94a5134ffe95bf6c08aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Посетить узел AST.  <br /></td></tr>
 <tr class="separator:abde62e405ddb94a5134ffe95bf6c08aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc9ceb44424b3774a846f6f82fa3bfa3" id="r_adc9ceb44424b3774a846f6f82fa3bfa3"><td class="memItemLeft" align="right" valign="top"><a id="adc9ceb44424b3774a846f6f82fa3bfa3" name="adc9ceb44424b3774a846f6f82fa3bfa3"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>currentInstruction</b> ()</td></tr>
+<tr class="memitem:adc9ceb44424b3774a846f6f82fa3bfa3" id="r_adc9ceb44424b3774a846f6f82fa3bfa3"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCodeGenerator.html#adc9ceb44424b3774a846f6f82fa3bfa3">currentInstruction</a> ()</td></tr>
+<tr class="memdesc:adc9ceb44424b3774a846f6f82fa3bfa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Получить текущую позицию в списке команд  <br /></td></tr>
 <tr class="separator:adc9ceb44424b3774a846f6f82fa3bfa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a952f42d8b393c4cc33a0a4edc85f7de1" id="r_a952f42d8b393c4cc33a0a4edc85f7de1"><td class="memItemLeft" align="right" valign="top"><a id="a952f42d8b393c4cc33a0a4edc85f7de1" name="a952f42d8b393c4cc33a0a4edc85f7de1"></a>
 std::vector&lt; <a class="el" href="structCommand.html">Command</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>commands</b></td></tr>
+<tr class="memdesc:a952f42d8b393c4cc33a0a4edc85f7de1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Сгенерированные команды <br /></td></tr>
 <tr class="separator:a952f42d8b393c4cc33a0a4edc85f7de1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6fbef315ab542f1f4d776f13e641dac" id="r_ad6fbef315ab542f1f4d776f13e641dac"><td class="memItemLeft" align="right" valign="top"><a id="ad6fbef315ab542f1f4d776f13e641dac" name="ad6fbef315ab542f1f4d776f13e641dac"></a>
 std::unordered_map&lt; std::string, size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>functionStart</b></td></tr>
+<tr class="memdesc:ad6fbef315ab542f1f4d776f13e641dac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Карта начала функций <br /></td></tr>
 <tr class="separator:ad6fbef315ab542f1f4d776f13e641dac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Генератор кода для виртуальной машины </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a9afd3e079da52ed173af0af275e4c0ca" name="a9afd3e079da52ed173af0af275e4c0ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9afd3e079da52ed173af0af275e4c0ca">&#9670;&#160;</a></span>CodeGenerator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">CodeGenerator::CodeGenerator </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classProgram.html">Program</a> *&#160;</td>
+          <td class="paramname"><em>program</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Конструктор </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">program</td><td>Корневой узел AST программы </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="adc9ceb44424b3774a846f6f82fa3bfa3" name="adc9ceb44424b3774a846f6f82fa3bfa3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc9ceb44424b3774a846f6f82fa3bfa3">&#9670;&#160;</a></span>currentInstruction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t CodeGenerator::currentInstruction </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Получить текущую позицию в списке команд </p>
+<dl class="section return"><dt>Returns</dt><dd>Индекс текущей команды </dd></dl>
+
+</div>
+</div>
+<a id="abde62e405ddb94a5134ffe95bf6c08aa" name="abde62e405ddb94a5134ffe95bf6c08aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abde62e405ddb94a5134ffe95bf6c08aa">&#9670;&#160;</a></span>visitNode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CodeGenerator::visitNode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classASTNode.html">ASTNode</a> *&#160;</td>
+          <td class="paramname"><em>node</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Посетить узел AST. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">node</td><td>Узел AST </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="codegen_8h_source.html">codegen.h</a></li>
 <li><b>codegen.cpp</b></li>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['использования_0',['Пример использования',['../classSemanticAnalyzer_1_1Scope.html#example',1,'']]]
+  ['выполняемые_20проверки_0',['Выполняемые проверки',['../classSemanticAnalyzer.html#checks',1,'']]]
 ];

@@ -1,9 +1,6 @@
 var searchData=
 [
-  ['thenbranch_0',['thenBranch',['../classIfStmt.html#aa9c9f872cbb2a3d3c3a9bf56e8aaf37f',1,'IfStmt']]],
-  ['tid_1',['TID',['../classTID.html',1,'']]],
-  ['tid_3c_20array_20_3e_2',['TID&lt; Array &gt;',['../classTID.html',1,'']]],
-  ['tid_3c_20value_20_3e_3',['TID&lt; Value &gt;',['../classTID.html',1,'']]],
-  ['token_4',['Token',['../structToken.html',1,'']]],
-  ['type_5',['type',['../structType.html',1,'Type'],['../classExpression.html#a169e0d9577fe174b7b7bb5f584cf37a9',1,'Expression::type'],['../classVarDecl.html#a26f265634422794810116c611d215488',1,'VarDecl::type'],['../structParameter.html#a9216e13c6d6eb4cb1b82c92600a60561',1,'Parameter::type'],['../structType.html#a78339313d36891f18427c431ea84e306',1,'Type::Type()'],['../structType.html#a458658b4849f156c268ab057c5ec4ab2',1,'Type::Type(BasicType b, bool arr=false, int sz=0)']]]
+  ['semanticanalyzer_0',['semanticanalyzer',['../classSemanticAnalyzer.html',1,'SemanticAnalyzer'],['../classSemanticAnalyzer.html#aff115a021566dddab7e108332e1d1196',1,'SemanticAnalyzer::SemanticAnalyzer()']]],
+  ['size_1',['size',['../structType.html#a871302dc63ac1a37c0b6a225cf82048d',1,'Type']]],
+  ['statements_2',['statements',['../classBlockStmt.html#ad2f5aed08a5c1f465749b136e722ec19',1,'BlockStmt']]]
 ];

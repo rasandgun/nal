@@ -96,30 +96,202 @@ $(document).ready(function(){initNavTree('classTID.html',''); initResizable(); }
   <div class="headertitle"><div class="title">TID&lt; T &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Таблица идентификаторов с поддержкой вложенных областей видимости  
+ <a href="classTID.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="runtime_8h_source.html">runtime.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTID_1_1node.html">node</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Узел таблицы идентификаторов  <a href="structTID_1_1node.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8527b7d4d1c0439b3d9ec854ff02c813" id="r_a8527b7d4d1c0439b3d9ec854ff02c813"><td class="memItemLeft" align="right" valign="top"><a id="a8527b7d4d1c0439b3d9ec854ff02c813" name="a8527b7d4d1c0439b3d9ec854ff02c813"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> (<a class="el" href="structTID_1_1node.html">node</a> *cur)</td></tr>
-<tr class="separator:a8527b7d4d1c0439b3d9ec854ff02c813"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7561b596e3723389072cf19d50c7a603" id="r_a7561b596e3723389072cf19d50c7a603"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTID.html#a7561b596e3723389072cf19d50c7a603">clear</a> (<a class="el" href="structTID_1_1node.html">node</a> *v)</td></tr>
+<tr class="memdesc:a7561b596e3723389072cf19d50c7a603"><td class="mdescLeft">&#160;</td><td class="mdescRight">Очистка узлов таблицы  <br /></td></tr>
+<tr class="separator:a7561b596e3723389072cf19d50c7a603"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54bf8e12a062320b7a250f50186e7ac1" id="r_a54bf8e12a062320b7a250f50186e7ac1"><td class="memItemLeft" align="right" valign="top"><a id="a54bf8e12a062320b7a250f50186e7ac1" name="a54bf8e12a062320b7a250f50186e7ac1"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>openScope</b> ()</td></tr>
+<tr class="memdesc:a54bf8e12a062320b7a250f50186e7ac1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Открыть новую область видимости <br /></td></tr>
 <tr class="separator:a54bf8e12a062320b7a250f50186e7ac1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada549e269bb77db2e713ca4d655727ce" id="r_ada549e269bb77db2e713ca4d655727ce"><td class="memItemLeft" align="right" valign="top"><a id="ada549e269bb77db2e713ca4d655727ce" name="ada549e269bb77db2e713ca4d655727ce"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>popScope</b> ()</td></tr>
+<tr class="memdesc:ada549e269bb77db2e713ca4d655727ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Закрыть текущую область видимости <br /></td></tr>
 <tr class="separator:ada549e269bb77db2e713ca4d655727ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3fca1048b6f6459a21dfab639dd35ecb" id="r_a3fca1048b6f6459a21dfab639dd35ecb"><td class="memItemLeft" align="right" valign="top"><a id="a3fca1048b6f6459a21dfab639dd35ecb" name="a3fca1048b6f6459a21dfab639dd35ecb"></a>
-T *&#160;</td><td class="memItemRight" valign="bottom"><b>lookUp</b> (const std::string &amp;name)</td></tr>
+<tr class="memitem:a3fca1048b6f6459a21dfab639dd35ecb" id="r_a3fca1048b6f6459a21dfab639dd35ecb"><td class="memItemLeft" align="right" valign="top">T *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTID.html#a3fca1048b6f6459a21dfab639dd35ecb">lookUp</a> (const std::string &amp;name)</td></tr>
+<tr class="memdesc:a3fca1048b6f6459a21dfab639dd35ecb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Поиск идентификатора  <br /></td></tr>
 <tr class="separator:a3fca1048b6f6459a21dfab639dd35ecb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17b19b2f18d01f3bb61555c703f1aef5" id="r_a17b19b2f18d01f3bb61555c703f1aef5"><td class="memItemLeft" align="right" valign="top"><a id="a17b19b2f18d01f3bb61555c703f1aef5" name="a17b19b2f18d01f3bb61555c703f1aef5"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>declare</b> (const std::string &amp;name)</td></tr>
+<tr class="memitem:a17b19b2f18d01f3bb61555c703f1aef5" id="r_a17b19b2f18d01f3bb61555c703f1aef5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTID.html#a17b19b2f18d01f3bb61555c703f1aef5">declare</a> (const std::string &amp;name)</td></tr>
+<tr class="memdesc:a17b19b2f18d01f3bb61555c703f1aef5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Объявить идентификатор в текущей области  <br /></td></tr>
 <tr class="separator:a17b19b2f18d01f3bb61555c703f1aef5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12d382411ff9af84cbc18de3db95cc0e" id="r_a12d382411ff9af84cbc18de3db95cc0e"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTID.html#a12d382411ff9af84cbc18de3db95cc0e">getHeight</a> () const</td></tr>
+<tr class="memdesc:a12d382411ff9af84cbc18de3db95cc0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Получить глубину вложенности  <br /></td></tr>
+<tr class="separator:a12d382411ff9af84cbc18de3db95cc0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename T&gt;<br />
+class TID&lt; T &gt;</div><p>Таблица идентификаторов с поддержкой вложенных областей видимости </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Тип хранимых данных </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a7561b596e3723389072cf19d50c7a603" name="a7561b596e3723389072cf19d50c7a603"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7561b596e3723389072cf19d50c7a603">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classTID.html">TID</a>&lt; T &gt;::clear </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structTID_1_1node.html">node</a> *&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Очистка узлов таблицы </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td>Начальный узел </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a17b19b2f18d01f3bb61555c703f1aef5" name="a17b19b2f18d01f3bb61555c703f1aef5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17b19b2f18d01f3bb61555c703f1aef5">&#9670;&#160;</a></span>declare()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classTID.html">TID</a>&lt; T &gt;::declare </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Объявить идентификатор в текущей области </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Имя идентификатора </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>Если идентификатор уже объявлен </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a12d382411ff9af84cbc18de3db95cc0e" name="a12d382411ff9af84cbc18de3db95cc0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12d382411ff9af84cbc18de3db95cc0e">&#9670;&#160;</a></span>getHeight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classTID.html">TID</a>&lt; T &gt;::getHeight </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Получить глубину вложенности </p>
+<dl class="section return"><dt>Returns</dt><dd>Текущая глубина </dd></dl>
+
+</div>
+</div>
+<a id="a3fca1048b6f6459a21dfab639dd35ecb" name="a3fca1048b6f6459a21dfab639dd35ecb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fca1048b6f6459a21dfab639dd35ecb">&#9670;&#160;</a></span>lookUp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T * <a class="el" href="classTID.html">TID</a>&lt; T &gt;::lookUp </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Поиск идентификатора </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Имя идентификатора </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Указатель на найденное значение </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>Если идентификатор не найден </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="runtime_8h_source.html">runtime.h</a></li>
 </ul>
