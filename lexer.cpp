@@ -9,6 +9,11 @@ char Lexer::current() const {
     return source[pos];
 }
 
+char Lexer::peek() const {
+    if (pos + 1 >= source.size()) return '\0';
+    return source[pos + 1];
+}
+
 void Lexer::advance() {
     if (current() == '\n') {
         line++;
@@ -131,9 +136,21 @@ std::vector<Token> Lexer::tokenize() {
         } else if (c == '\'') {
             tokens.push_back(readChar());
         } else {
-            tokens.push_back(readOperatorOrDelimiter());
+            if (current() == '/' && peek() == '/')
+                skipComment();
+            else
+                tokens.push_back(readOperatorOrDelimiter());
         }
     }
     tokens.push_back(makeToken(TOK_EOF, ""));
     return tokens;
+}
+
+void Lexer::skipComment() {
+    advance();
+    advance();
+    while (!isAtEnd() && current() != '\n')
+        advance();
+    if (!isAtEnd())
+        advance();
 }

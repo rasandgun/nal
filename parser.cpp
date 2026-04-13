@@ -10,11 +10,11 @@ bool Parser::isAtEnd() const { return peek().type == TOK_EOF; }
 void Parser::advance() { if (!isAtEnd()) pos++; }
 
 bool Parser::match(const std::string& value) {
-    if (check(value)) {
-        advance();
-        return true;
-    }
-    return false;
+  if (check(value)) {
+    advance();
+    return true;
+  }
+  return false;
 }
 
 bool Parser::check(const std::string& value) const {

@@ -8,21 +8,14 @@
 #include "codegen.h"
 
 
-
-
-
-
-
-
-
 void printAST(ASTNode* node, int indent = 0) {
     if (!node) return;
     for (int i = 0; i < indent; ++i) std::cout << "  ";
 
     if (Program* p = dynamic_cast<Program*>(node)) {
-        std::cout << "Program\n";
-        for (size_t i = 0; i < p->declarations.size(); ++i)
-            printAST(p->declarations[i], indent + 1);
+      std::cout << "Program\n";
+      for (size_t i = 0; i < p->declarations.size(); ++i)
+        printAST(p->declarations[i], indent + 1);
     } else if (FunctionDecl* f = dynamic_cast<FunctionDecl*>(node)) {
         std::cout << "Function " << f->name << " (";
         for (size_t i = 0; i < f->params.size(); ++i) {
@@ -145,7 +138,6 @@ int main(int argc, char* argv[]) {
         std::cerr << "Cannot open file: " << argv[1] << "\n";
         return 1;
     }
-
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string source = buffer.str();

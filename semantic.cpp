@@ -241,33 +241,40 @@ Type SemanticAnalyzer::getExprType(Expression* node) {
         std::string op = bin->op;
         Type result;
 
-        if (op == "=" || op == "*=" || op == "/=" || op == "%=" || op == "+=" || op == "-=") {
-            if (!dynamic_cast<IdentifierExpr*>(bin->left) && !dynamic_cast<ArrayAccessExpr*>(bin->left))
-                throw std::runtime_error("Left side of assignment must be lvalue");
-            if (!typeCompatible(left, right))
-                throw std::runtime_error("Type mismatch in assignment");
-            result = left;
-            std::string varName = getLValueName(bin->left);
-            Symbol* sym = current->lookup(varName);
-            if (!sym) throw std::runtime_error("Symbol not found: " + varName);
-        }
-        else if (op == "+" || op == "-" || op == "*" || op == "/" || op == "%") {
-            if (!isArithmetic(left) || !isArithmetic(right))
-                throw std::runtime_error("Arithmetic operation requires arithmetic types");
-            result = (left.base == TYPE_FLOAT || right.base == TYPE_FLOAT) ? Type(TYPE_FLOAT) : Type(TYPE_INT);
-        }
-        else if (op == "==" || op == "!=" || op == "<" || op == ">" || op == "<=" || op == ">=") {
-            if (!typeCompatible(left, right))
-                throw std::runtime_error("Comparison of incompatible types");
-            result = Type(TYPE_BOOL);
-        }
-        else if (op == "&&" || op == "||") {
-            if (!isScalar(left) || !isScalar(right))
-                throw std::runtime_error("Logical operation requires scalar types");
-            result = Type(TYPE_BOOL);
-        }
-        else {
-            throw std::runtime_error("Unknown operator: " + op);
+        if (op == "=" || op == "*=" || op == "/=" || op == "%=" || op == "+=" ||
+            op == "-=") {
+          if (!dynamic_cast<IdentifierExpr*>(bin->left) &&
+              !dynamic_cast<ArrayAccessExpr*>(bin->left))
+            throw std::runtime_error("Left side of assignment must be lvalue");
+          if (left.isArray)
+            throw std::runtime_error(
+                "Can't assign arrays except string literals while initializing "
+                "strings");
+          if (!typeCompatible(left, right))
+            throw std::runtime_error("Type mismatch in assignment");
+          result = left;
+          std::string varName = getLValueName(bin->left);
+          Symbol* sym = current->lookup(varName);
+          if (!sym) throw std::runtime_error("Symbol not found: " + varName);
+        } else if (op == "+" || op == "-" || op == "*" || op == "/" ||
+                   op == "%") {
+          if (!isArithmetic(left) || !isArithmetic(right))
+            throw std::runtime_error(
+                "Arithmetic operation requires arithmetic types");
+          result = (left.base == TYPE_FLOAT || right.base == TYPE_FLOAT)
+                       ? Type(TYPE_FLOAT)
+                       : Type(TYPE_INT);
+        } else if (op == "==" || op == "!=" || op == "<" || op == ">" ||
+                   op == "<=" || op == ">=") {
+          if (!typeCompatible(left, right))
+            throw std::runtime_error("Comparison of incompatible types");
+          result = Type(TYPE_BOOL);
+        } else if (op == "&&" || op == "||") {
+          if (!isScalar(left) || !isScalar(right))
+            throw std::runtime_error("Logical operation requires scalar types");
+          result = Type(TYPE_BOOL);
+        } else {
+          throw std::runtime_error("Unknown operator: " + op);
         }
         node->type = result;
         return result;
@@ -331,9 +338,8 @@ Type SemanticAnalyzer::getExprType(Expression* node) {
 
 bool SemanticAnalyzer::typeCompatible(const Type& left, const Type& right) {
     if (left.isArray && right.isArray) {
-        if (left.base != right.base) return false;
-        if (left.size != right.size) return false;
-        return true;
+        if (left.base == TYPE_CHAR && right.base == TYPE_CHAR) return true;
+        return false;
     }
     if (left.isArray != right.isArray) return false;
     if (left.base == right.base) return true;

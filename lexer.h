@@ -24,6 +24,8 @@ private:
     Token readString();
     Token readChar();
     Token readOperatorOrDelimiter();
+    char peek() const;
+    void skipComment();
 };
 
 #endif

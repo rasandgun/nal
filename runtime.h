@@ -3,7 +3,14 @@
 #include "codegen.h"
 #include <stack>
 #include <iostream>
+#include <map>
+#include <string>
+#include <flat_map>
 
+/**
+ * @brief Печать значения
+ * @param val Значение для печати
+ */
 inline void printValue(Value val) {
     if (val.type == TYPE_BOOL) {
         std::cout << val.bit;
@@ -17,6 +24,12 @@ inline void printValue(Value val) {
         std::cout << "UNKNOWN";
     }
 }
+
+/**
+ * @brief Преобразование типа в строку
+ * @param t Тип для преобразования
+ * @return Строковое представление типа
+ */
 inline std::string typeToString(const Type& t) {
     std::string base;
     switch (t.base) {
@@ -33,6 +46,10 @@ inline std::string typeToString(const Type& t) {
     return base;
 }
 
+/**
+ * @brief Печать команды виртуальной машины
+ * @param cmd Команда для печати
+ */
 inline void printCommand(const Command& cmd) {
     switch (cmd.inst) {
         case ADD: std::cout << "ADD"; break;
@@ -100,10 +117,12 @@ inline void printCommand(const Command& cmd) {
         case READ_INT   :  std::cout << "READ_INT";  break;
         case READ_FLOAT :  std::cout << "READ_FLOAT";break;
         case READ_CHAR  :  std::cout << "READ_CHAR"; break;
-        case PRINT_INT  :  std::cout << "PRINT_INT"; break;
+        case PRINT_INT:
+          std::cout << "PRINT_INT";
+          break;
         case PRINT_FLOAT  :  std::cout << "PRINT_FLOAT"; break;
         case PRINT_CHAR  :  std::cout << "PRINT_CHAR"; break;
-        
+        case INIT_ARRAY_STRING : std::cout << "INIT_ARRAY_STRING"; break;
         default:
             std::cout << cmd.inst << std::endl;
             std::cout << "UNKNOWN";
@@ -111,20 +130,25 @@ inline void printCommand(const Command& cmd) {
     std::cout << std::endl;
 }
 
-
+/**
+ * @brief Рекурсивная печать стека значений
+ * @param s Стек значений
+ */
 inline void printRecursive(std::stack<Value>& s) {
     if (s.empty()) return;
 
     Value x = s.top();
     s.pop();
     
-    printRecursive(s); // Recurse to the bottom
+    printRecursive(s);
     printValue(x);
     std::cout << std::endl;
     s.push(x); 
 }
 
-
+/**
+ * @brief Структура массива для виртуальной машины
+ */
 struct Array {
     BasicType type;
     size_t size;
@@ -136,77 +160,145 @@ struct Array {
     };
     ~Array() {
         if (type == TYPE_BOOL)
-            delete bit;
+            delete[] bit;
         if (type == TYPE_INT)
-            delete i32;
+            delete[] i32;
         if (type == TYPE_FLOAT)
-            delete f64;
+            delete[] f64;
         if (type == TYPE_CHAR)
-            delete byte;
+            delete[] byte;
     }
 };
+
+/**
+ * @brief Таблица идентификаторов с поддержкой вложенных областей видимости
+ * @tparam T Тип хранимых данных
+ */
 template<typename T>
 class TID {
 public:
+    /**
+     * @brief Узел таблицы идентификаторов
+     */
     struct node {
         node(node* prev) : prev(prev) {
         }
         node *prev;
         std::unordered_map<std::string, T> table;
     };
-    void clear(node *cur) {
-        if (cur->prev) clear(cur->prev);
-        delete cur;
+    
+    /**
+     * @brief Очистка узлов таблицы
+     * @param v Начальный узел
+     */
+    void clear(node *v) {
+        node *current = v;
+        while (current != nullptr) {
+            node *prev = current->prev;
+            delete current;
+            current = prev;
+        }
     }
-    TID() : top(nullptr) {
+    
+    TID() : top(nullptr), height(0) {
     }
+    
     ~TID() {
         if (top)
             clear(top);
     }
+    
+    /**
+     * @brief Открыть новую область видимости
+     */
     void openScope() {
+        height++;
         top = new node(top);
     }
+    
+    /**
+     * @brief Закрыть текущую область видимости
+     */
     void popScope() {
+        height--;
         node *old = top;
         top = top->prev;
         delete old;
     }
+    
+    /**
+     * @brief Поиск идентификатора
+     * @param name Имя идентификатора
+     * @return Указатель на найденное значение
+     * @throws std::runtime_error Если идентификатор не найден
+     */
     T* lookUp(const std::string &name) {
         node *current = top;
         while (current) {
-            if (current->table.count(name))
-                return &current->table[name];
+            auto searchRes = current->table.find(name);
+            if (searchRes != current->table.end())
+                return &searchRes->second;
             current = current->prev;
         }
         throw std::runtime_error("Couldn't find symbol " + name);
     }
+    
+    /**
+     * @brief Объявить идентификатор в текущей области
+     * @param name Имя идентификатора
+     * @throws std::runtime_error Если идентификатор уже объявлен
+     */
     void declare(const std::string &name) {
         if (top->table.count(name))
             throw std::runtime_error(name + " was already declared at current scope");
         top->table[name] = T();
     }
+    
+    /**
+     * @brief Получить глубину вложенности
+     * @return Текущая глубина
+     */
+    size_t getHeight() const {
+        return height;
+    }
+    
 private:
+    size_t height;
     node *top;
 };
 
+/**
+ * @brief Исполнитель виртуальной машины
+ */
 class Runner {
 public:
+    /**
+     * @brief Конструктор исполнителя
+     * @param commands Список команд для выполнения
+     * @param functionStart Карта начала функций
+     */
     Runner(std::vector<Command> commands, std::unordered_map<std::string, size_t> functionStart) :
     commands_(std::move(commands)), functionStart_(std::move(functionStart)), current_command_(0){}
+    
+    /**
+     * @brief Запуск выполнения программы
+     */
     void run();
+    
 private:
-    TID<Value> variableTID_;
-    TID<Array> arrayTID_;    
-    std::vector<Command> commands_; 
-    std::unordered_map<std::string, size_t> functionStart_;
-    size_t current_command_;
-    std::stack<Value> stack_;
-    std::stack<size_t> callStack_;
+    TID<Value> variableTID_;     ///< Таблица переменных
+    TID<Array> arrayTID_;        ///< Таблица массивов
+    std::vector<Command> commands_;      ///< Список команд
+    std::unordered_map<std::string, size_t> functionStart_;  ///< Начала функций
+    size_t current_command_;     ///< Текущий указатель команды
+    std::stack<Value> stack_;    ///< Стек значений
+    std::stack<size_t> callStack_; ///< Стек вызовов
+    
     Value toFloat(Value x);
     Value toInt(Value x);
     Value toChar(Value x);
     Value toBool(Value x);
+    
     void I_ADD();
     void I_SUB();
     void I_MUL();
@@ -246,7 +338,4 @@ private:
     void I_INIT_ARRAY_STRING(const std::string& arrayName, const std::string& str);
 };
 
-
-
 #endif
-

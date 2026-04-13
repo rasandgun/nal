@@ -283,8 +283,6 @@ void Runner::I_SCOPEOPEN() {
 
 void Runner::I_DECLAREVAR(const std::string &name, Type type) {
     if (type.isArray) {
-        ////TODO: 
-        //throw std::runtime_error("Arrays are not implemented yet");
         arrayTID_.declare(name);
         auto& arr = *arrayTID_.lookUp(name);
         arr.type = type.base;
@@ -363,7 +361,6 @@ void Runner::I_RET() {
 }
 
 void Runner::I_HALT() {
-
 }
 
 void Runner::I_READ_INT() {
@@ -438,6 +435,8 @@ void Runner::I_STORE_ARRAY(const std::string &name) {
     size_t index = toInt(stack_.top()).i32;
     stack_.pop();
     auto &arr = *arrayTID_.lookUp(name);
+    if (index >= arr.size)
+        throw std::out_of_range("Index " + std::to_string(index) + "is out of range(array " + name + " of size" + std::to_string(arr.size));
     switch(arr.type) {
         case TYPE_INT:
             arr.i32[index] = toInt(val).i32;
@@ -493,14 +492,14 @@ void Runner::I_INIT_ARRAY_STRING(const std::string& arrayName, const std::string
 
     for (size_t i = 0; i < len; ++i)
         arr->byte[i] = str[i];
-    // остаток массива можно не обнулять
+    
 }
 
 void Runner::run() {
     while (commands_[current_command_].inst != HALT) {
         auto &command = commands_[current_command_];
-        //printCommand(command);
-        //std::cout << std::endl;
+        
+        
         switch (command.inst)
         {
         case SCOPEOPEN:
@@ -626,13 +625,33 @@ void Runner::run() {
             I_INIT_ARRAY_STRING(command.argName, command.argStr);
             current_command_++;
             break;
-        default:
-            std::cout << "FAILED" << std::endl;
-            std::cout << command.inst;
-            throw std::runtime_error("aa");
+        case GE:
+            I_GE();
+            current_command_++;
             break;
+        case LE:
+            I_LE();
+            current_command_++;
+            break;
+        case NE:
+            I_NE();
+            current_command_++;
+            break;
+        case OR:
+            I_OR();
+            current_command_++;
+            break;
+        case AND:
+            I_AND();
+            current_command_++;
+            break;
+        default:
+          std::cout << "FAILED" << std::endl;
+          std::cout << command.inst;
+          throw std::runtime_error("aa");
+          break;
         }
-        //printRecursive(stack_);
+        
     }
 }
 
