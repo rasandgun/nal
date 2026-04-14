@@ -70,6 +70,8 @@ enum Instruction {
     PRINT_FLOAT,  ///< Печать вещественного числа
     PRINT_CHAR,   ///< Печать символа
     INIT_ARRAY_STRING, ///< Инициализация строки-массива
+    SWAP,
+    OVER,
 };
 
 /**

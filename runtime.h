@@ -123,6 +123,8 @@ inline void printCommand(const Command& cmd) {
         case PRINT_FLOAT  :  std::cout << "PRINT_FLOAT"; break;
         case PRINT_CHAR  :  std::cout << "PRINT_CHAR"; break;
         case INIT_ARRAY_STRING : std::cout << "INIT_ARRAY_STRING"; break;
+        case SWAP: std::cout << "SWAP"; break;
+        case OVER: std::cout << "OVER"; break;
         default:
             std::cout << cmd.inst << std::endl;
             std::cout << "UNKNOWN";
@@ -298,7 +300,8 @@ private:
     Value toInt(Value x);
     Value toChar(Value x);
     Value toBool(Value x);
-    
+
+    void I_DUP();
     void I_ADD();
     void I_SUB();
     void I_MUL();
@@ -336,6 +339,8 @@ private:
     void I_PRINT_CHAR();
     void I_PRINT_FLOAT();
     void I_INIT_ARRAY_STRING(const std::string& arrayName, const std::string& str);
+    void I_SWAP();
+    void I_OVER();
 };
 
 #endif

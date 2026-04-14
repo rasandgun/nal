@@ -3,7 +3,7 @@
 
 ## 1. Введение
 
-NAL (Natural Algorithmic Language) — язык со статической типизацией. Точка входа — функция `void main()`.
+NAL (Natural Algorithmic Language) — язык со статической типизацией. Точка входа — функция `int main()`.
 
 Комментарии: `// текст до конца строки`.
 

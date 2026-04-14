@@ -478,7 +478,32 @@ void Runner::I_PRINT_FLOAT() {
         throw std::runtime_error("Stack is empty");
     std::cout << toFloat(stack_.top()).f64;
 }
+
+void Runner::I_DUP() {
+    if (stack_.empty())
+        throw std::runtime_error("Stack is empty");
+    stack_.push(stack_.top());
+}
     
+
+void Runner::I_SWAP() {
+    if (stack_.size() < 2)
+        throw std::runtime_error("Not enough elements");
+    Value top = stack_.top();
+    stack_.pop();
+    Value under = stack_.top();
+    stack_.pop();
+    stack_.push(top);
+    stack_.push(under);
+}
+
+void Runner::I_OVER() {
+    if (stack_.size() < 2) throw std::runtime_error("Not enough elements");
+    Value under = stack_.top(); stack_.pop();
+    Value over = stack_.top();
+    stack_.push(under);
+    stack_.push(over);
+}
 
 void Runner::I_INIT_ARRAY_STRING(const std::string& arrayName, const std::string& str) {
     auto* arr = arrayTID_.lookUp(arrayName);
@@ -645,13 +670,27 @@ void Runner::run() {
             I_AND();
             current_command_++;
             break;
+        case DUP:
+            I_DUP();
+            current_command_++;
+            break;
+        case SWAP:
+            I_SWAP();
+            current_command_++;
+            break;
+        case OVER:
+            I_OVER();
+            current_command_++;
+            break;
         default:
           std::cout << "FAILED" << std::endl;
           std::cout << command.inst;
           throw std::runtime_error("aa");
           break;
         }
-        
+        /*std::cout << "STACK:---------------------------\n";
+        printRecursive(stack_);
+        std::cout << "---------------------------------\n";*/
     }
 }
 

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 
+
 static Instruction binaryOpToInst(const std::string& op) {
     if (op == "+")  return ADD;
     if (op == "-")  return SUB;
@@ -23,32 +24,38 @@ static Instruction binaryOpToInst(const std::string& op) {
 
 void CodeGenerator::emitAssignment(Expression* left, const std::string& op, Expression* right) {
     if (auto* id = dynamic_cast<IdentifierExpr*>(left)) {
-        visitNode(right);
         if (op != "=") {
-            commands.push_back(Command(LOAD, id->name));
-            std::string baseOp = op.substr(0, op.size() - 1);
-            commands.push_back(Command(binaryOpToInst(baseOp)));
-        }
-        commands.push_back(Command(ASSIGN, id->name));
-    }
-    else if (auto* arr = dynamic_cast<ArrayAccessExpr*>(left)) {
-        visitNode(arr->index);
-        if (op != "=") {
-            commands.push_back(Command(DUP));            
-            commands.push_back(Command(LOAD_ARRAY, arr->array->name));
-            visitNode(right);                               
+            commands.push_back(Command(LOAD, id->name));   
+            visitNode(right);                              
             std::string baseOp = op.substr(0, op.size() - 1);
             commands.push_back(Command(binaryOpToInst(baseOp)));
         } else {
             visitNode(right);
         }
+        
+        commands.push_back(Command(DUP));
+        commands.push_back(Command(ASSIGN, id->name));
+    }
+    else if (auto* arr = dynamic_cast<ArrayAccessExpr*>(left)) {
+        visitNode(arr->index);
+        if (op != "=") {
+            commands.push_back(Command(DUP));
+            commands.push_back(Command(LOAD_ARRAY, arr->array->name));
+            visitNode(right);
+            std::string baseOp = op.substr(0, op.size() - 1);
+            commands.push_back(Command(binaryOpToInst(baseOp)));
+        } else {
+            visitNode(right);
+        }
+        
+        commands.push_back(Command(SWAP));  
+        commands.push_back(Command(OVER));  
         commands.push_back(Command(STORE_ARRAY, arr->array->name));
     }
     else {
         throw std::runtime_error("Invalid left side of assignment");
     }
 }
-
 
 void CodeGenerator::visitNode(ASTNode* node) {
     if (!node) return;
@@ -140,7 +147,12 @@ void CodeGenerator::visitNode(ASTNode* node) {
         size_t updateStart = currentInstruction();
         for (auto addr : loopStack.back().continueAddr)
             commands[addr] = Command(JUMP, (int)updateStart);
-        if (fr->update) visitNode(fr->update);
+        if (fr->update) {
+            visitNode(fr->update);
+            if (fr->update->type.base != TYPE_VOID) {
+                commands.push_back(Command(POP));
+            }
+        }
         commands.push_back(Command(JUMP, (int)condStart));
         size_t afterLoop = currentInstruction();
         for (auto addr : loopStack.back().breakAddr)
@@ -152,8 +164,8 @@ void CodeGenerator::visitNode(ASTNode* node) {
     else if (auto* ret = dynamic_cast<ReturnStmt*>(node)) {
         if (ret->expr) {
             visitNode(ret->expr);
-        } else {
         }
+        
         for (size_t i = 0; i < openedScopes; i++)
             commands.push_back(Command(SCOPEPOP));
         commands.push_back(Command(RET));
@@ -170,6 +182,10 @@ void CodeGenerator::visitNode(ASTNode* node) {
     }
     else if (auto* es = dynamic_cast<ExprStmt*>(node)) {
         visitNode(es->expr);
+        
+        if (es->expr->type.base != TYPE_VOID) {
+            commands.push_back(Command(POP));
+        }
     }
     else if (auto* var = dynamic_cast<VarDecl*>(node)) {
         commands.push_back(Command(DECLAREVAR, var->type, var->name));
@@ -212,6 +228,7 @@ void CodeGenerator::visitNode(ASTNode* node) {
         } else if (un->op == "!") {
             commands.push_back(Command(NOT));
         } else if (un->op == "+") {
+            
         } else {
             throw std::runtime_error("Unknown unary operator: " + un->op);
         }
@@ -247,6 +264,7 @@ void CodeGenerator::visitNode(ASTNode* node) {
             for (auto* arg : call->args)
                 visitNode(arg);
             commands.push_back(Command(PRINT_INT));
+            
         } else if (call->funcName == "print_char") {
             if (call->args.size() != 1)
                 throw std::runtime_error("print_char takes 1 argument");
@@ -261,18 +279,23 @@ void CodeGenerator::visitNode(ASTNode* node) {
                 visitNode(arg);
             commands.push_back(Command(PRINT_FLOAT));
         } else {
+            
             std::reverse(call->args.begin(), call->args.end());
             for (auto* arg : call->args)
                 visitNode(arg);
             std::reverse(call->args.begin(), call->args.end());
             commands.push_back(Command(CALL, call->funcName));
+            
+            
         }
     }
     else if (auto* comma = dynamic_cast<CommaExpr*>(node)) {
         for (size_t i = 0; i < comma->exprs.size(); ++i) {
             visitNode(comma->exprs[i]);
             if (i != comma->exprs.size() - 1) {
-                commands.push_back(Command(POP)); 
+                if (comma->exprs[i]->type.base != TYPE_VOID) {
+                    commands.push_back(Command(POP));
+                }
             }
         }
     }
@@ -306,6 +329,7 @@ void CodeGenerator::generate() {
     commands.push_back(Command(CALL, "main"));
     commands.push_back(Command(POP));   
     commands.push_back(Command(HALT));
+
     for (auto func : functions) {
         visitNode(func);
     }
